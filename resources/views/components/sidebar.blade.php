@@ -1,0 +1,175 @@
+<aside class="erp-sidebar" id="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-brand">
+        <div class="brand-icon">
+            <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div class="brand-text">
+            <span class="brand-name">BLIVING</span>
+            <span class="brand-tag">ERP Gestion</span>
+        </div>
+        <button class="sidebar-toggle d-lg-none" id="sidebarClose">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <span class="nav-label">Module Syndic</span>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{{ url('/dashboard_syndic') }}" class="nav-link {{ Request::is('dashboard_syndic*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </span>
+                        <span class="nav-text">Dashboard Syndic</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/cotisations') }}" class="nav-link {{ Request::is('cotisations*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-coins"></i>
+                        </span>
+                        <span class="nav-text">Cotisations</span>
+                        <span class="nav-badge danger" id="nb-cot">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/charges_depenses') }}" class="nav-link {{ Request::is('charges_depenses*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-receipt"></i>
+                        </span>
+                        <span class="nav-text">Charges & Dépenses</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/budget_annuel') }}" class="nav-link {{ Request::is('budget*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </span>
+                        <span class="nav-text">Budget Annuel</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/coproprietaires') }}" class="nav-link {{ Request::is('coproprietaires*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </span>
+                        <span class="nav-text">Copropriétaires</span>
+                        <span class="nav-count">8</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/reclamations') }}" class="nav-link {{ Request::is('reclamations*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </span>
+                        <span class="nav-text">Réclamations</span>
+                        <span class="nav-badge danger" id="nb-recl">2</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!--
+        <div class="nav-section">
+            <span class="nav-label">Finances</span>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{{ url('/paiements_loyers') }}" class="nav-link {{ Request::is('paiements_loyers*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </span>
+                        <span class="nav-text">Paiements loyers</span>
+                        <span class="nav-badge danger">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-receipt"></i>
+                        </span>
+                        <span class="nav-text">Charges</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </span>
+                        <span class="nav-text">Rapports</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-label">Gestion</span>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </span>
+                        <span class="nav-text">Locataires</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <span class="nav-text">Propriétaires</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-clipboard-list"></i>                        </span>
+                        <span class="nav-text">Réclamations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-gear"></i>
+                        </span>
+                        <span class="nav-text">Paramètres</span>
+                    </a>
+                </li>
+            </ul>
+        </div>-->
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        <div class="footer-user">
+            <div class="user-avatar-sm">
+                <span>AM</span>
+            </div>
+            <div class="user-info-sm">
+                <span class="user-name-sm">Admin Syndic</span>
+                <span class="user-role-sm">Administrateur</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+@push('scripts')
+<script>
+    // ── Mobile Sidebar Toggle ───────────────────────────────────
+        document.getElementById('sidebarOpen')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('active');
+        });
+        ['sidebarClose', 'sidebarOverlay'].forEach(id => {
+            document.getElementById(id)?.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            });
+        });
+</script>
+@endpush
