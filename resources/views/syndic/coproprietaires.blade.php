@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="page-header">
-        <div class="ph-left"><h2>Copropriétaires</h2><p>Propriétaires de la Résidence Atlas et suivi de leurs cotisations</p></div>
+        <div class="ph-left"><h2>Copropriétaires</h2><p>Propriétaires de la Bliving Office et suivi de leurs cotisations</p></div>
         <div class="ph-right">
           <button class="btn-outline-erp"><i class="fa-solid fa-download"></i> Export</button>
           <button class="btn-primary-erp" onclick="openModal('modalCoproprietaire')"><i class="fa-solid fa-user-plus"></i> Ajouter</button>
@@ -34,7 +34,7 @@
               <div class="oc-stat"><div class="oc-stat-val" style="color:var(--text-4)">0</div><div class="oc-stat-lbl">MAD reste</div></div>
             </div>
             <div style="display:flex;gap:6px;margin-top:12px">
-              <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-eye"></i> Détail</button>
+              <button class="btn-outline-erp" onclick="openModal('modalDetail')" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-eye"></i> Détail</button>
               <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-envelope"></i> Contacter</button>
             </div>
           </div>
@@ -71,7 +71,7 @@
             </div>
             <div style="display:flex;gap:6px;margin-top:12px">
               <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-eye"></i> Détail</button>
-              <button class="btn-primary-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button>
+              <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-envelope"></i> Contacter</button>
             </div>
           </div>
         </div>
@@ -89,7 +89,7 @@
             </div>
             <div style="display:flex;gap:6px;margin-top:12px">
               <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-eye"></i> Détail</button>
-              <button class="btn-primary-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button>
+              <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-envelope"></i> Contacter</button>
             </div>
           </div>
         </div>
@@ -172,4 +172,31 @@
   </div>
 </div>
 
+<!-- modal -->
+ <div class="modal-overlay" id="modalDetail">
+  <div class="modal-panel">
+    
+    <div class="modal-head">
+      <div>
+        <h3 class="mh-title" id="detailName">Nom</h3>
+        <p class="mh-sub" id="detailLot">Lot</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalDetail')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p><strong>Email :</strong> <span id="detailEmail"></span></p>
+      <p><strong>Téléphone :</strong> <span id="detailPhone"></span></p>
+      <p><strong>Date signature de contrat :</strong> <span id="detailContrat"></span></p>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-outline-erp" onclick="closeModal('modalDetail')">Fermer</button>
+    </div>
+
+  </div>
+</div>
 @endsection

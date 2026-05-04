@@ -7,7 +7,7 @@
       <div class="page-header">
         <div class="ph-left">
           <h2>Cotisations</h2>
-          <p>Suivi des paiements des copropriétaires — Résidence Atlas · 2026</p>
+          <p>Suivi des paiements des copropriétaires — Bliving Office · 2026</p>
         </div>
         <div class="ph-right">
           <button class="btn-outline-erp"><i class="fa-solid fa-download"></i> Exporter</button>
@@ -41,11 +41,11 @@
               <tr><th><input type="checkbox" class="row-check"></th><th>Copropriétaire</th><th>Appartement</th><th>Montant Annuel</th><th>Payé</th><th>Reste</th><th>Date Echeance</th><th>Mode</th><th>Statut</th><th>Actions</th></tr>
             </thead>
             <tbody>
-              <tr><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#4f46e5">KB</div><div><span class="t-name">Karim Benali</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 01</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">7 680 MAD</span></td><td><span style="color:var(--text-4);font-weight:500">— MAD</span></td><td>-</td><td><span class="s-badge active">Virement</span></td><td><span class="s-badge paid">Payé</span></td><td><div class="row-actions"><button class="ra-btn view"><i class="fa-solid fa-eye"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
-              <tr><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#0891b2">SO</div><div><span class="t-name">Sara Ouali</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 02</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">7 680 MAD</span></td><td><span style="color:var(--text-4);font-weight:500">— MAD</span></td><td>-</td><td><span class="s-badge active">Espèces</span></td><td><span class="s-badge paid">Payé</span></td><td><div class="row-actions"><button class="ra-btn view"><i class="fa-solid fa-eye"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
-              <tr style="background:rgba(245,158,11,.025)"><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#d97706">LK</div><div><span class="t-name">Leila Khadiri</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 03</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--amber-t)">4 000 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--orange-t)">3 680 MAD</span></td><td>-</td><td>—</td><td><span class="s-badge partial">Partiel</span></td><td><div class="row-actions"><button class="ra-btn encaisser" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
-              <tr style="background:rgba(239,68,68,.025)"><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#dc2626">RA</div><div><span class="t-name">Rachid Alami</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 04</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--text-4)">0 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--red-t)">7 680 MAD</span></td><td>-</td><td>—</td><td><span class="s-badge late">En retard</span></td><td><div class="row-actions"><button class="ra-btn encaisser" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button><button class="ra-btn" style="color:var(--orange-t)" title="Relancer"><i class="fa-solid fa-paper-plane"></i></button></div></td></tr>
-              <tr style="background:rgba(239,68,68,.025)"><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#7c3aed">NB</div><div><span class="t-name">Nadia Berrada</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 05</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--text-4)">0 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--red-t)">7 680 MAD</span></td><td>-</td><td>—</td><td><span class="s-badge late">En retard</span></td><td><div class="row-actions"><button class="ra-btn encaisser" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button><button class="ra-btn" style="color:var(--orange-t)" title="Relancer"><i class="fa-solid fa-paper-plane"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#4f46e5">KB</div><div><span class="t-name">Karim Benali</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 01</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">7 680 MAD</span></td><td><span style="color:var(--text-4);font-weight:500">— MAD</span></td><td>-</td><td><span class="s-badge active">Virement</span></td><td><span class="s-badge paid">Payé</span></td><td><div class="row-actions"><button class="ra-btn view"><i class="fa-solid fa-eye" onclick="openModal('modalViewHistorique')"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#0891b2">SO</div><div><span class="t-name">Sara Ouali</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 02</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">7 680 MAD</span></td><td><span style="color:var(--text-4);font-weight:500">— MAD</span></td><td>-</td><td><span class="s-badge active">Espèces</span></td><td><span class="s-badge paid">Payé</span></td><td><div class="row-actions"><button class="ra-btn view"><i class="fa-solid fa-eye" onclick="openModal('modalViewHistorique')"></i></button></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
+              <tr style="background:rgba(245,158,11,.025)"><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#d97706">LK</div><div><span class="t-name">Leila Khadiri</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 03</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--amber-t)">4 000 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--orange-t)">3 680 MAD</span></td><td>-</td><td>—</td><td><span class="s-badge partial">Partiel</span></td><td><div class="row-actions"><button class="ra-btn encaisser" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button><button class="ra-btn view"><i class="fa-solid fa-eye" onclick="openModal('modalViewHistorique')"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
+              <tr style="background:rgba(239,68,68,.025)"><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#dc2626">RA</div><div><span class="t-name">Rachid Alami</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 04</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--text-4)">0 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--red-t)">7 680 MAD</span></td><td>-</td><td>—</td><td><span class="s-badge late">En retard</span></td><td><div class="row-actions"><button class="ra-btn encaisser" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button><button class="ra-btn view"><i class="fa-solid fa-eye" onclick="openModal('modalViewHistorique')"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button><button class="ra-btn" style="color:var(--orange-t)" title="Relancer"><i class="fa-solid fa-paper-plane"></i></button></div></td></tr>
+              <tr style="background:rgba(239,68,68,.025)"><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#7c3aed">NB</div><div><span class="t-name">Nadia Berrada</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 05</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--text-4)">0 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--red-t)">7 680 MAD</span></td><td>-</td><td>—</td><td><span class="s-badge late">En retard</span></td><td><div class="row-actions"><button class="ra-btn encaisser" onclick="openModal('modalCotisation')"><i class="fa-solid fa-cash-register"></i> Encaisser</button><button class="ra-btn view"><i class="fa-solid fa-eye" onclick="openModal('modalViewHistorique')"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button><button class="ra-btn" style="color:var(--orange-t)" title="Relancer"><i class="fa-solid fa-paper-plane"></i></button></div></td></tr>
               <tr><td><input type="checkbox" class="row-check"></td><td><div class="tenant-cell"><div class="t-avatar" style="background:#059669">YM</div><div><span class="t-name">Youssef Mouhib</span><span class="t-type">Propriétaire</span></div></div></td><td><span class="ref-code">Apt. 06</span></td><td><span class="amount-main">7 680 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">7 680 MAD</span></td><td><span style="color:var(--text-4);font-weight:500">— MAD</span></td><td>-</td><td><span class="s-badge active">Chèque</span></td><td><span class="s-badge paid">Payé</span></td><td><div class="row-actions"><button class="ra-btn view"><i class="fa-solid fa-eye"></i></button><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></div></td></tr>
             </tbody>
           </table>
@@ -88,5 +88,80 @@
     </div>
   </div>
 </div>
+<!-- modal -->
+ <div class="modal-overlay" id="modalViewHistorique">
+  <div class="modal-panel" style="max-width: 750px;"> 
+    <div class="modal-head">
+      <div>
+        <h3 class="mh-title">Détails et Historique</h3>
+        <p class="mh-sub">Informations des paiements pour l'Appartement 01</p>
+      </div>
+      <div class="mh-right">
+        <button class="modal-close" onclick="closeModal('modalViewHistorique')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      
+      <div class="form-section-label"><i class="fa-solid fa-user"></i> Informations du Copropriétaire</div>
+      <div class="kpi-row" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px;">
+        <div class="kpi-card" style="padding: 15px; border: 1px solid var(--border-color);">
+          <div style="font-size: 13px; color: var(--text-3);">Copropriétaire</div>
+          <div style="font-weight: 600; font-size: 16px;">Karim Benali</div>
+          <div style="font-size: 13px; color: var(--text-4);">karim.benali@email.com • 06 00 00 00 00</div>
+        </div>
+        <div class="kpi-card" style="padding: 15px; border: 1px solid var(--border-color);">
+          <div style="font-size: 13px; color: var(--text-3);">Bilan 2026</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+            <div>
+              <span style="font-size: 12px; color: var(--text-4);">Payé</span>
+              <div style="font-weight: 700; color: var(--green-t);">7 680 MAD</div>
+            </div>
+            <div>
+              <span style="font-size: 12px; color: var(--text-4);">Reste</span>
+              <div style="font-weight: 700; color: var(--text-3);">0 MAD</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <div class="form-section-label"><i class="fa-solid fa-clock-rotate-left"></i> Historique détaillé des paiements</div>
+      <div class="table-responsive" style="border: 1px solid var(--border-color); border-radius: 8px;">
+        <table class="erp-table" style="margin: 0; box-shadow: none;">
+          <thead style="background: var(--bg-body);">
+            <tr>
+              <th>Date</th>
+              <th>Montant</th>
+              <th>Mode</th>
+              <th>Référence</th>
+              <th>Justificatif</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>05/02/2026</td>
+              <td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">4 000 MAD</span></td>
+              <td><span class="s-badge active">Virement</span></td>
+              <td><span style="color:var(--text-4);font-size:13px;">VIR-892374</span></td>
+              <td><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></td>
+            </tr>
+            <tr>
+              <td>12/03/2026</td>
+              <td><span style="font-family:var(--font-h);font-weight:700;color:var(--green-t)">3 680 MAD</span></td>
+              <td><span class="s-badge active">Espèces</span></td>
+              <td><span style="color:var(--text-4);font-size:13px;">Reçu N°45</span></td>
+              <td><button class="ra-btn download"><i class="fa-solid fa-file-pdf"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <div class="mf-left"></div>
+      <div class="mf-right">
+        <button class="btn-outline-erp" onclick="closeModal('modalViewHistorique')">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection

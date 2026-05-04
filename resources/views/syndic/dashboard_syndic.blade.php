@@ -10,11 +10,11 @@
       <div class="page-header">
         <div class="ph-left">
           <h2>Dashboard Syndic</h2>
-          <p>Vue d'ensemble de la Résidence Atlas — Exercice 2026</p>
+          <p>Vue d'ensemble de la Bliving Office — Exercice 2026</p>
         </div>
         <div class="ph-right">
           <button class="btn-outline-erp"><i class="fa-solid fa-print"></i> Rapport</button>
-          <button class="btn-primary-erp"><i class="fa-solid fa-plus"></i> Nouvelle dépense</button>
+
         </div>
       </div>
 
@@ -61,7 +61,7 @@
         </div>
         <div class="kpi-card kpi-purple" style="animation-delay:.3s">
           <div class="kpi-top">
-            <div><div class="kpi-label">Copropriétaires</div><div class="kpi-value">8</div><div class="kpi-sub">Résidence Atlas</div></div>
+            <div><div class="kpi-label">Copropriétaires</div><div class="kpi-value">8</div><div class="kpi-sub">Bliving Office</div></div>
             <div class="kpi-icon purple"><i class="fa-solid fa-users"></i></div>
           </div>
           <div class="kpi-progress"><div class="kpi-progress-bar" style="width:100%"></div></div>
@@ -92,10 +92,7 @@
           <div class="alert-icon"><i class="fa-solid fa-fire"></i></div>
           <div><div class="alert-title">2 réclamations urgentes en attente</div><div class="alert-msg">Problème ascenseur (Apt. 07) + Fuite toiture (Apt. 18) — créées il y a plus de 7 jours</div></div>
         </div>
-        <div class="alert-card alert-info" style="animation:fadeUp .4s ease .55s both">
-          <div class="alert-icon"><i class="fa-solid fa-calendar-check"></i></div>
-          <div><div class="alert-title">Réunion copropriétaires — 15 Mai 2026</div><div class="alert-msg">Présenter le bilan annuel 2025 et voter le budget 2026. Penser à envoyer les convocations.</div></div>
-        </div>
+
       </div>
 
       <!-- Graphiques + activité -->
@@ -103,7 +100,7 @@
         <div class="col-12 col-xl-8">
           <div class="chart-card">
             <div class="cc-header">
-              <div><h5 class="cc-title">Cotisations vs Dépenses — 2026</h5><p class="cc-sub">Mensuel · Résidence Atlas</p></div>
+              <div><h5 class="cc-title">Cotisations vs Dépenses — 2026</h5><p class="cc-sub">Mensuel · Bliving Office</p></div>
               <button class="btn-outline-erp" style="font-size:12px;padding:6px 12px">Voir tout</button>
             </div>
             <canvas id="chartDashboard" height="80"></canvas>
@@ -111,13 +108,12 @@
         </div>
         <div class="col-12 col-xl-4">
           <div class="chart-card" style="height:100%">
-            <div class="cc-header"><h5 class="cc-title">Répartition Dépenses</h5><p class="cc-sub">Par catégorie 2026</p></div>
+            <div class="cc-header"><h5 class="cc-title">Cautisation Résidents</h5><p class="cc-sub">Par catégorie 2026</p></div>
             <canvas id="chartDep" height="180"></canvas>
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#6366f1;flex-shrink:0"></span>Maintenance</span><strong>38%</strong></div>
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0"></span>Sécurité</span><strong>24%</strong></div>
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>Travaux</span><strong>22%</strong></div>
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>Admin</span><strong>16%</strong></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0"></span>Partiel</span><strong>20%</strong></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>En retard</span><strong>30%</strong></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>Payé</span><strong>50%</strong></div>
             </div>
           </div>
         </div>
@@ -172,8 +168,8 @@
     depChartInst = new Chart(ctx2.getContext('2d'), {
         type: 'doughnut',
         data: {
-        labels: ['Maintenance','Sécurité','Travaux','Admin'],
-        datasets: [{ data:[38,24,22,16], backgroundColor:['#6366f1','#f59e0b','#ef4444','#22c55e'], borderColor:'#fff', borderWidth:3, hoverOffset:6 }]
+        labels: ['Partiel','En retard','Payé'],
+        datasets: [{ data:[20,30,50], backgroundColor:['#f59e0b','#ef4444','#22c55e'], borderColor:'#fff', borderWidth:3, hoverOffset:6 }]
         },
         options: {
         cutout:'72%', responsive:true,

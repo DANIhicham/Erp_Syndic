@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="navbar-right">
-      <!-- 🆕 Sélecteur résidence active -->
+      <!--  Sélecteur résidence active -->
       <div class="residence-selector d-none d-md-flex">
         <span class="rs-dot"></span>
         <span class="rs-name">Bliving Office</span>
@@ -27,20 +27,20 @@
         <div class="navbar-user dropdown">
             <button class="user-toggle" data-bs-toggle="dropdown">
                 <div class="user-avatar">
-                    <span>AM</span>
+                    <span>{{ auth()->user()->initiales }}</span>
                 </div>
                 <div class="user-details d-none d-md-block">
-                    <span class="user-name">Ahmed M.</span>
-                    <span class="user-role">Administrateur</span>
+                    <span class="user-name">{{ auth()->user()->nom }} {{ auth()->user()->prenom }} </span>
+                    <span class="user-role">{{ auth()->user()->role }} </span>
                 </div>
                 <i class="fa-solid fa-chevron-down chevron-icon d-none d-md-block"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end user-dropdown">
                 <li class="dropdown-user-header">
-                    <div class="duh-avatar">AM</div>
+                    <div class="duh-avatar">{{ auth()->user()->initiales }}</div>
                     <div>
-                        <strong>Ahmed Mansouri</strong>
-                        <small>admin@syndicpro.ma</small>
+                        <strong>{{ auth()->user()->nom }} {{ auth()->user()->prenom }}</strong>
+                        <small>{{ auth()->user()->email }}</small>
                     </div>
                 </li>
                 <li><hr class="dropdown-divider"></li>
@@ -48,9 +48,14 @@
                 <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear me-2"></i>Paramètres</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                    <a class="dropdown-item logout-item" href="#">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>Déconnexion
-                    </a>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                            @csrf
+                            <button type="submit" class="dropdown-item logout-item" style="border:none;background:none;width:100%;text-align:left;">
+                                <i class="fa-solid fa-right-from-bracket me-2"></i>Déconnexion
+                            </button>
+                        </form>
+                    </li>
                 </li>
             </ul>
         </div>      

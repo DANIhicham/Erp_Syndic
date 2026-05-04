@@ -145,11 +145,11 @@
     <div class="sidebar-footer">
         <div class="footer-user">
             <div class="user-avatar-sm">
-                <span>AM</span>
+                <span>{{ auth()->user()->initiales }}</span>
             </div>
             <div class="user-info-sm">
-                <span class="user-name-sm">Admin Syndic</span>
-                <span class="user-role-sm">Administrateur</span>
+                <span class="user-name-sm">{{ auth()->user()->nom }} {{ auth()->user()->prenom }} </span>
+                <span class="user-role-sm">{{ auth()->user()->role }}</span>
             </div>
         </div>
     </div>

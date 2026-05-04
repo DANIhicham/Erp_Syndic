@@ -12,10 +12,8 @@ Route::get('/test', function () {
 })->name('test.form');
 
 //Page login
-Route::get('/login', function () {
-    return view('login'); // ta vue Blade avec le loader
-})->name('test.form');
-
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 // Traitement du formulaire (POST)
 Route::post('/test-submit', function () {
     // simulation d’un traitement
@@ -27,7 +25,7 @@ Route::post('/test-submit', function () {
 
 // Partie Syndic ERP
 Route::get('/dashboard_syndic', function () {
-    return view('syndic.dashboard_syndic'); // correspond à resources/views/dashboard.blade.php
+    return view('syndic.dashboard_syndic'); 
 })->name('dashboard_syndic');
 
 Route::get('/cotisations', function () {
@@ -49,6 +47,7 @@ Route::get('/coproprietaires', function () {
 Route::get('/reclamations', function () {
     return view('syndic.reclamations');  
 })->name('Reclamations');
+//fin partie synic
 
 
 Route::get('/voir', function () {
@@ -66,3 +65,12 @@ Route::get('/paiements_loyers', function () {
 Route::get('/charges', function () {
     return view('pages.charges');
 })->name('charges');
+
+//partie resident
+
+Route::get('/resident_dashboard', function () {
+    return view('resident.resident_dash');
+})->name('resident_dash');
+
+
+require __DIR__.'/auth.php';

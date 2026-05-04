@@ -17,11 +17,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['nom', 'prenom', 'email', 'telephone', 'role', 'cin', 'password', 'etat'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -33,6 +29,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function appartements() { return $this->hasMany(Appartement::class, 'proprietaire_id'); }
     /**
      * Get the attributes that should be cast.
      *
@@ -44,5 +41,28 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSyndic()
+    {
+        return $this->role === 'syndic';
+    }
+
+    public function isProprietaire()
+    {
+        return $this->role === 'proprietaire';
+    }
+    
+
+    public function getInitialesAttribute()
+    {
+    return strtoupper(
+        substr($this->nom, 0, 1) . substr($this->prenom, 0, 1)
+    );
     }
 }

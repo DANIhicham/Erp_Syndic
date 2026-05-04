@@ -7,17 +7,17 @@
 
 
 <div class="page-header">
-        <div class="ph-left"><h2>Réclamations Syndic</h2><p>Problèmes signalés dans la Résidence Atlas</p></div>
+        <div class="ph-left"><h2>Réclamations Syndic</h2><p>Problèmes signalés dans Bliving Office</p></div>
         <div class="ph-right">
           <button class="btn-primary-erp" onclick="openModal('modalReclamation')"><i class="fa-solid fa-plus"></i> Nouvelle réclamation</button>
         </div>
       </div>
 
-      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
         <div class="kpi-card kpi-red" style="animation-delay:.05s"><div class="kpi-top"><div><div class="kpi-label">Ouvertes</div><div class="kpi-value">3</div><div class="kpi-sub"><span class="kpi-badge-alert"><i class="fa-solid fa-fire"></i> 2 urgentes</span></div></div><div class="kpi-icon red"><i class="fa-solid fa-circle-exclamation"></i></div></div></div>
         <div class="kpi-card kpi-orange" style="animation-delay:.1s"><div class="kpi-top"><div><div class="kpi-label">En cours</div><div class="kpi-value">1</div><div class="kpi-sub">Technicien mandaté</div></div><div class="kpi-icon orange"><i class="fa-solid fa-spinner"></i></div></div></div>
         <div class="kpi-card kpi-green" style="animation-delay:.15s"><div class="kpi-top"><div><div class="kpi-label">Résolues</div><div class="kpi-value">12</div><div class="kpi-sub">Ce mois</div></div><div class="kpi-icon green"><i class="fa-solid fa-check-circle"></i></div></div></div>
-        <div class="kpi-card kpi-blue" style="animation-delay:.2s"><div class="kpi-top"><div><div class="kpi-label">Temps moyen</div><div class="kpi-value">3.5 <small style="font-size:13px;font-weight:500;color:var(--text-4)">jours</small></div><div class="kpi-sub">Résolution moyenne</div></div><div class="kpi-icon blue"><i class="fa-solid fa-clock"></i></div></div></div>
+      
       </div>
 
       <div class="filter-bar">

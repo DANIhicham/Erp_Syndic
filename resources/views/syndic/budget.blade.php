@@ -7,7 +7,7 @@
       <div class="page-header">
         <div class="ph-left">
           <h2>Budget Annuel</h2>
-          <p>Bilan financier — Résidence Atlas · 2026</p>
+          <p>Bilan financier — Bliving Office · 2026</p>
         </div>
         <div class="ph-right">
           <select class="filter-select"><option>2026</option><option>2025</option><option>2024</option></select>
@@ -64,23 +64,7 @@
         </div>
       </div>
 
-      <!-- Détail budget par catégorie -->
-      <div class="table-card">
-        <div class="table-card-header">
-          <div class="tch-left"><h5>Détail par Catégorie</h5><p>Dépenses réelles vs budget prévisionnel 2026</p></div>
-        </div>
-        <div class="table-responsive">
-          <table class="erp-table">
-            <thead><tr><th>Catégorie</th><th>Montant Prévu</th><th>Dépensé</th><th>Solde</th><th>Avancement</th></tr></thead>
-            <tbody>
-              <tr><td><span class="cat-badge maintenance" style="font-size:13px;padding:5px 12px">Maintenance</span></td><td><span class="amount-main">15 000 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--brand)">12 400 MAD</span></td><td><span style="color:var(--green-t);font-weight:700">+2 600</span></td><td><div style="width:140px"><div class="progress-mini"><div class="progress-mini-fill pfill-blue" style="width:83%"></div></div><span style="font-size:11px;color:var(--text-4)">83%</span></div></td></tr>
-              <tr><td><span class="cat-badge securite" style="font-size:13px;padding:5px 12px">Sécurité</span></td><td><span class="amount-main">10 000 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--brand)">9 400 MAD</span></td><td><span style="color:var(--green-t);font-weight:700">+600</span></td><td><div style="width:140px"><div class="progress-mini"><div class="progress-mini-fill pfill-orange" style="width:94%"></div></div><span style="font-size:11px;color:var(--text-4)">94%</span></div></td></tr>
-              <tr><td><span class="cat-badge travaux" style="font-size:13px;padding:5px 12px">Travaux</span></td><td><span class="amount-main">12 000 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--red-t)">14 800 MAD</span></td><td><span style="color:var(--red-t);font-weight:700">-2 800</span></td><td><div style="width:140px"><div class="progress-mini"><div class="progress-mini-fill pfill-red" style="width:100%"></div></div><span style="font-size:11px;color:var(--red-t)">123% ⚠</span></div></td></tr>
-              <tr><td><span class="cat-badge admin" style="font-size:13px;padding:5px 12px">Administration</span></td><td><span class="amount-main">5 000 MAD</span></td><td><span style="font-family:var(--font-h);font-weight:700;color:var(--brand)">2 600 MAD</span></td><td><span style="color:var(--green-t);font-weight:700">+2 400</span></td><td><div style="width:140px"><div class="progress-mini"><div class="progress-mini-fill pfill-green" style="width:52%"></div></div><span style="font-size:11px;color:var(--text-4)">52%</span></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      
 
 <!-- Modal Configurer Budget -->
 <div class="modal-overlay" id="modalBudget">
@@ -91,7 +75,7 @@
     </div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group"><label class="form-label">Résidence</label><select class="form-control-erp"><option>Résidence Atlas</option><option>Résidence Palmeraie</option></select></div>
+        <!-- <div class="form-group"><label class="form-label">Résidence</label><select class="form-control-erp"><option>Résidence Atlas</option><option>Résidence Palmeraie</option></select></div> -->
         <div class="form-group"><label class="form-label">Année <span class="req">*</span></label><select class="form-control-erp"><option>2026</option><option>2027</option></select></div>
         <div class="form-group" style="grid-column:1/-1"><label class="form-label">Montant annuel fixe par appartement (MAD) <span class="req">*</span></label><input type="number" class="form-control-erp" value="7680" placeholder="ex: 7680"></div>
       </div>
