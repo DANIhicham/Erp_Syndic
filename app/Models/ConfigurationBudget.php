@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConfigurationBudget extends Model
 {
-    protected $table = 'configurations_budget';
+    protected $table = 'configuration_budgets';
 
     protected $fillable = [
         'residence_id',

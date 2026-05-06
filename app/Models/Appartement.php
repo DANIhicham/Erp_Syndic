@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appartement extends Model
 {   
-    protected $fillable = ['residence_id', 'proprietaire_id', 'numero', 'etage', 'surface', 'statut_occupation', 'date_signature_contrat'];
+    protected $fillable = ['residence_id', 'proprietaire_id', 'numero', 'etage', 'statut_occupation', 'date_signature_contrat'];
 
     public function residence() { return $this->belongsTo(Residence::class); }
     public function proprietaire() { return $this->belongsTo(User::class, 'proprietaire_id'); }

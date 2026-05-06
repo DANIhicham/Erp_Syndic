@@ -10,7 +10,7 @@
           <p>Bilan financier — Bliving Office · 2026</p>
         </div>
         <div class="ph-right">
-          <select class="filter-select"><option>2026</option><option>2025</option><option>2024</option></select>
+          <select onchange="window.location.href='?annee='+this.value" class="filter-select"><option>Année</option><option>2026</option><option>2025</option><option>2024</option></select>
           <button class="btn-outline-erp"><i class="fa-solid fa-print"></i> Imprimer bilan</button>
           <button class="btn-primary-erp" onclick="openModal('modalBudget')"><i class="fa-solid fa-gear"></i> Configurer budget</button>
         </div>
@@ -20,17 +20,17 @@
       <div class="bilan-row">
         <div class="bilan-block" style="border-top:3px solid var(--green)">
           <div class="bilan-icon" style="background:var(--green-bg);color:var(--green-t)"><i class="fa-solid fa-arrow-trend-up"></i></div>
-          <div class="bilan-val" style="color:var(--green-t)">61 440 MAD</div>
+          <div class="bilan-val" style="color:var(--green-t)">{{ number_format($totalPrevu, 0, ',', ' ') }} MAD</div>
           <div class="bilan-lbl">Total Cotisations Prévu</div>
         </div>
         <div class="bilan-block" style="border-top:3px solid var(--red)">
           <div class="bilan-icon" style="background:var(--red-bg);color:var(--red-t)"><i class="fa-solid fa-arrow-trend-down"></i></div>
-          <div class="bilan-val" style="color:var(--red-t)">39 200 MAD</div>
+          <div class="bilan-val" style="color:var(--red-t)">{{ number_format($totalDepenses, 0, ',', ' ') }} MAD</div>
           <div class="bilan-lbl">Total Dépenses Réelles</div>
         </div>
         <div class="bilan-block" style="border-top:3px solid var(--teal)">
           <div class="bilan-icon" style="background:var(--teal-bg);color:var(--teal-t)"><i class="fa-solid fa-scale-balanced"></i></div>
-          <div class="bilan-val" style="color:var(--teal-t)">+8 700 MAD</div>
+          <div class="bilan-val" style="color:var(--teal-t)">{{ $solde >= 0 ? '+' : '' }}{{ number_format($solde, 0, ',', ' ') }} MAD</div>
           <div class="bilan-lbl">Solde (Encaissé − Dépenses)</div>
         </div>
       </div>
@@ -49,16 +49,16 @@
               <div class="budget-ring">
                 <svg viewBox="0 0 36 36" width="100" height="100">
                   <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f5f9" stroke-width="3"/>
-                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#6366f1" stroke-width="3" stroke-dasharray="78 22" stroke-linecap="round"/>
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#6366f1" stroke-width="3" stroke-dasharray="{{ $taux }} {{ 100 - $taux }}" stroke-linecap="round"/>
                 </svg>
-                <div class="budget-ring-pct">78%</div>
+                <div class="budget-ring-pct">{{ $taux }}%</div>
               </div>
               <div class="budget-ring-label">Cotisations collectées</div>
             </div>
             <div style="margin-top:20px">
-              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-circle-check" style="color:var(--green-t)"></i>Payé intégralement</span><span class="stat-value">5 / 8</span></div>
-              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-code-branch" style="color:var(--amber-t)"></i>Partiel</span><span class="stat-value">1 / 8</span></div>
-              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clock" style="color:var(--red-t)"></i>Impayé</span><span class="stat-value">2 / 8</span></div>
+              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-circle-check" style="color:var(--green-t)"></i>Payé intégralement</span><span class="stat-value">0 / {{ $nbAppartements }}</span></div>
+              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-code-branch" style="color:var(--amber-t)"></i>Partiel</span><span class="stat-value">0 / {{ $nbAppartements }}</span></div>
+              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clock" style="color:var(--red-t)"></i>Impayé</span><span class="stat-value">0 / {{ $nbAppartements }}</span></div>
             </div>
           </div>
         </div>
@@ -76,20 +76,39 @@
     <div class="modal-body">
       <div class="form-grid">
         <!-- <div class="form-group"><label class="form-label">Résidence</label><select class="form-control-erp"><option>Résidence Atlas</option><option>Résidence Palmeraie</option></select></div> -->
-        <div class="form-group"><label class="form-label">Année <span class="req">*</span></label><select class="form-control-erp"><option>2026</option><option>2027</option></select></div>
-        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Montant annuel fixe par appartement (MAD) <span class="req">*</span></label><input type="number" class="form-control-erp" value="7680" placeholder="ex: 7680"></div>
+         <form id="budgetForm" class="form-group" method="POST" action="{{ route('budget.store') }}">
+              @csrf
+              <label class="form-label">Année <span class="req">*</span></label>
+              <select id="anneeSelect" class="form-control-erp" name="annee" class="form-control-erp">
+                  @for($i = date('Y'); $i <= date('Y') + 2; $i++)
+                      <option value="{{ $i }}">{{ $i }}</option>
+                  @endfor
+              </select>
+              <div class="form-group" style="grid-column:1/-1"><label class="form-label">Montant annuel fixe par appartement (MAD) <span class="req">*</span></label>
+              <input type="number" name="montant_annuel_fixe"
+                    class="form-control-erp"
+                    value="{{ $montantAnnuel }}"
+                    required>
+              </div>
+             
+         
+        <!-- <div class="form-group"><label class="form-label">Année <span class="req">*</span></label><select class="form-control-erp"><option>2026</option><option>2027</option></select></div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Montant annuel fixe par appartement (MAD) <span class="req">*</span></label><input type="number" class="form-control-erp" value="7680" placeholder="ex: 7680"></div> -->
       </div>
       <div class="info-grid" style="margin-top:16px;margin-bottom:0">
-        <div class="info-block"><div class="ib-label">Nbre appartements</div><div class="ib-value accent">8</div></div>
-        <div class="info-block"><div class="ib-label">Budget total calculé</div><div class="ib-value green">61 440 MAD</div></div>
-        <div class="info-block"><div class="ib-label">Montant / mois</div><div class="ib-value">640 MAD</div></div>
+        <div class="info-block"><div class="ib-label">Nbre appartements</div><div class="ib-value accent">{{ $nbAppartements }}</div></div>
+        <div class="info-block"><div class="ib-label">Budget total calculé</div><div class="ib-value green">{{ number_format($totalPrevu, 0, ',', ' ') }} MAD</div></div>
+        <div class="info-block"><div class="ib-label">Montant / mois</div><div class="ib-value">{{ number_format($montantAnnuel / 12, 0, ',', ' ') }} MAD</div></div>
       </div>
     </div>
     <div class="modal-foot">
       <div class="mf-left"><button class="btn-outline-erp" onclick="closeModal('modalBudget')">Annuler</button></div>
-      <div class="mf-right"><button class="btn-primary-erp" onclick="submitForm('modalBudget','Budget configuré','Configuration du budget 2026 sauvegardée.')"><i class="fa-solid fa-floppy-disk"></i> Sauvegarder</button></div>
-    </div>
+      <div class="mf-right"><button class="btn-primary-erp" type="submit"><i class="fa-solid fa-floppy-disk"></i> Sauvegarder</button></div>
+    </div> </form>
   </div>
+</div>
+<div class="alert alert-info">
+    ID de la résidence actuelle : {{ session('residence_id', 'Session vide') }}
 </div>
 @push('scripts')
 
@@ -124,6 +143,23 @@ function initBudgetCharts() {
 
     document.addEventListener('DOMContentLoaded', function () {
         initBudgetCharts();
+    });
+
+    // Récupération des années déjà existantes envoyées par le contrôleur
+    const anneesExistantes = @json($anneesExistantes ?? []);
+
+    document.getElementById('budgetForm').addEventListener('submit', function(e) {
+        // Récupérer l'année sélectionnée dans le menu déroulant
+        const anneeSelectionnee = document.getElementById('anneeSelect').value;
+
+        // Vérifier si cette année est déjà dans la base de données
+        if (anneesExistantes.includes(parseInt(anneeSelectionnee))) {
+            const confirmation = confirm("Un budget existe déjà pour l'année " + anneeSelectionnee + ". Voulez-vous vraiment écraser le montant actuel ?");
+            
+            if (!confirmation) {
+                e.preventDefault(); // Annule l'envoi du formulaire si l'utilisateur clique sur "Annuler"
+            }
+        }
     });
 </script>
 @endpush 

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('proprietaire_id')->constrained('users')->onDelete('cascade');
             $table->string('numero');
             $table->integer('etage');
-            $table->float('surface');
             $table->string('statut_occupation'); 
             $table->date('date_signature_contrat')->nullable();
             $table->timestamps();

@@ -35,7 +35,7 @@
             </div>
             <div style="display:flex;gap:6px;margin-top:12px">
               <button class="btn-outline-erp" onclick="openModal('modalDetail')" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-eye"></i> Détail</button>
-              <button class="btn-outline-erp" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-envelope"></i> Contacter</button>
+              <button class="btn-outline-erp" onclick="openModal('modalCall')" style="flex:1;justify-content:center;font-size:12px;padding:6px"><i class="fa-solid fa-envelope"></i> Contacter</button>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@
 </div>
 
 <!-- Modal Encaisser Cotisation -->
-<div class="modal-overlay" id="modalCotisation">
+<!-- <div class="modal-overlay" id="modalCotisation">
   <div class="modal-panel">
     <div class="modal-head">
       <div><h3 class="mh-title">Encaisser Cotisation</h3><p class="mh-sub">Enregistrer un paiement de cotisation syndic</p></div>
@@ -170,9 +170,9 @@
       <div class="mf-right"><button class="btn-primary-erp" onclick="submitForm('modalCotisation','Cotisation enregistrée','Paiement de cotisation ajouté avec succès.')"><i class="fa-solid fa-circle-check"></i> Valider</button></div>
     </div>
   </div>
-</div>
+</div> -->
 
-<!-- modal -->
+<!-- modal info user -->
  <div class="modal-overlay" id="modalDetail">
   <div class="modal-panel">
     
@@ -195,6 +195,43 @@
 
     <div class="modal-foot">
       <button class="btn-outline-erp" onclick="closeModal('modalDetail')">Fermer</button>
+    </div>
+
+   </div>
+  </div>
+
+<!-- modal call -->
+  <div class="modal-overlay" id="modalCall">
+  <div class="modal-panel">
+    
+    <div class="modal-head">
+      <div>
+        <h3 class="mh-title" id="detailName">Nom</h3>
+        <p class="mh-sub" id="detailLot">Lot</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalCall')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="contact-info">
+        
+        
+        <!-- Boutons d'action -->
+        <div class="contact-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+          <a href="#" id="whatsappLink" target="_blank" class="btn-whatsapp" style="flex: 1; text-align: center; background: #25D366; color: white; padding: 10px; border-radius: 8px; text-decoration: none;">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+          </a>
+          <a href="#" id="callLink" class="btn-call" style="flex: 1; text-align: center; background: #3498db; color: white; padding: 10px; border-radius: 8px; text-decoration: none;">
+            <i class="fa-solid fa-phone"></i> Appeler
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-outline-erp" onclick="closeModal('modalCall')">Fermer</button>
     </div>
 
   </div>

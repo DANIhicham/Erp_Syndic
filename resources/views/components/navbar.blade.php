@@ -16,7 +16,17 @@
       <!--  Sélecteur résidence active -->
       <div class="residence-selector d-none d-md-flex">
         <span class="rs-dot"></span>
-        <span class="rs-name">Bliving Office</span>
+        <form method="POST" action="{{ route('set.residence') }}">
+            @csrf
+            <select name="residence_id" onchange="this.form.submit()" class="form-control-erp">
+                @foreach($residences as $residence)
+                    <option value="{{ $residence->id }}"
+                        {{ session('residence_id') == $residence->id ? 'selected' : '' }}>
+                        {{ $residence->nom }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
         <i class="fa-solid fa-chevron-down rs-arrow"></i>
       </div>
       <button class="action-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
