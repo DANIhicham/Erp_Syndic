@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Appartement extends Model
 {   
@@ -10,22 +12,40 @@ class Appartement extends Model
 
     public function residence() { return $this->belongsTo(Residence::class); }
     public function proprietaire() { return $this->belongsTo(User::class, 'proprietaire_id'); }
-    public function paiements() { return $this->hasMany(PaiementCotisation::class); }
 
-    // Logique pour calculer la date d'échéance dynamique
-    public function getDateEcheanceDynamiqueAttribute()
+
+    public function transactions()
     {
-    $annee = Carbon::now()->year;
-        $budgetAnnuel = ConfigurationBudget::where('residence_id', $this->residence_id)->where('annee', $annee)->first();
-        
-        if (!$budgetAnnuel) return null;
-
-        $totalPaye = $this->paiements()->where('annee_concernee', $annee)->sum('montant_paye');
-        
-        // Calcul : (Total Payé * 365) / 7680
-        $joursCouverts = ($totalPaye * 365) / $budgetAnnuel->montant_annuel_fixe;
-        
-        // On part de la date de signature du contrat
-        return Carbon::parse($this->date_signature_contrat)->addDays(floor($joursCouverts));
+        return $this->hasMany(TransactionPaiement::class, 'appartement_id');
     }
+
+    public function paiementCotisation(): HasMany
+    {
+    return $this->hasMany(PaiementCotisation::class, 'appartement_id');
+    }
+
+
+    // public function cotisation()
+    // {
+    //     return $this->hasMany(PaiementCotisation::class, 'appartement_id');
+    // }
+
+
+
+    // // Logique pour calculer la date d'échéance dynamique
+    // public function getDateEcheanceDynamiqueAttribute()
+    // {
+    // $annee = Carbon::now()->year;
+    //     $budgetAnnuel = ConfigurationBudget::where('residence_id', $this->residence_id)->where('annee', $annee)->first();
+        
+    //     if (!$budgetAnnuel) return null;
+
+    //     $totalPaye = $this->paiements()->where('annee_concernee', $annee)->sum('montant_paye');
+        
+    //     // Calcul : (Total Payé * 365) / 7680
+    //     $joursCouverts = ($totalPaye * 365) / $budgetAnnuel->montant_annuel_fixe;
+        
+    //     // On part de la date de signature du contrat
+    //     return Carbon::parse($this->date_signature_contrat)->addDays(floor($joursCouverts));
+    // }
 }

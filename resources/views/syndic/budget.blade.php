@@ -7,7 +7,7 @@
       <div class="page-header">
         <div class="ph-left">
           <h2>Budget Annuel</h2>
-          <p>Bilan financier — Bliving Office · 2026</p>
+          <p>Bilan financier —  2026</p>
         </div>
         <div class="ph-right">
           <select onchange="window.location.href='?annee='+this.value" class="filter-select"><option>Année</option><option>2026</option><option>2025</option><option>2024</option></select>
@@ -56,9 +56,9 @@
               <div class="budget-ring-label">Cotisations collectées</div>
             </div>
             <div style="margin-top:20px">
-              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-circle-check" style="color:var(--green-t)"></i>Payé intégralement</span><span class="stat-value">0 / {{ $nbAppartements }}</span></div>
-              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-code-branch" style="color:var(--amber-t)"></i>Partiel</span><span class="stat-value">0 / {{ $nbAppartements }}</span></div>
-              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clock" style="color:var(--red-t)"></i>Impayé</span><span class="stat-value">0 / {{ $nbAppartements }}</span></div>
+              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-circle-check" style="color:var(--green-t)"></i>Payé intégralement</span><span class="stat-value">{{ $nbPayes }} / {{ $nbAppartements }}</span></div>
+              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-code-branch" style="color:var(--amber-t)"></i>Partiel</span><span class="stat-value">{{ $nbPartiels }} / {{ $nbAppartements }}</span></div>
+              <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clock" style="color:var(--red-t)"></i>Impayé</span><span class="stat-value">{{ $nbImpayes }} / {{ $nbAppartements }}</span></div>
             </div>
           </div>
         </div>

@@ -203,6 +203,7 @@ a{text-decoration:none}
 .btn-outline-erp{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:#fff;border:1px solid var(--border-2);border-radius:var(--r-sm);color:var(--text-2);font-family:var(--font-b);font-size:13px;font-weight:500;cursor:pointer;transition:var(--tr)}
 .btn-outline-erp:hover{background:#f8fafc;border-color:#c7d2fe;color:var(--brand)}
 .btn-danger-soft{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:var(--red-bg);border:1px solid rgba(239,68,68,.2);border-radius:var(--r-sm);color:var(--red-t);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;transition:var(--tr)}
+.btn-contact{background-color: #16a34a;color: white;}
 
 /* ── KPI CARDS ─────────────────────────────────────────────────── */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}

@@ -7,7 +7,7 @@
     <div class="page-header">
       <div class="ph-left">
         <h2>Charges & Dépenses</h2>
-        <p>Suivi des échéances — Résidence Atlas · 2026</p>
+        <p>Suivi des échéances — 2026</p>
       </div>
       <div class="ph-right">
         <button class="btn-outline-erp" onclick="exportCSV()"><i class="fa-solid fa-download"></i> Export</button>
@@ -993,7 +993,7 @@ function showToast(t,title,msg){
   const cfg={s:{cls:'s',i:'fa-circle-check'},w:{cls:'w',i:'fa-triangle-exclamation'},e:{cls:'e',i:'fa-circle-xmark'}};
   const c=cfg[t]||cfg.s;
   const el=document.createElement('div'); el.className='toast-item';
-  el.innerHTML=`<div class="t-ico ${c.cls}"><i class="fa-solid ${c.i}"></i></div><div class="t-body"><div class="t-title">${title}</div><div class="t-msg">${msg}</div></div><button class="t-x" onclick="rmToast(this.closest('.toast-item'))"><i class="fa-solid fa-xmark"></i></button>`;
+  el.innerHTML=`<div class=".toast-icon-wrap ${c.cls}"><i class="fa-solid ${c.i}"></i></div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div><button class="toast-x" onclick="rmToast(this.closest('.toast-item'))"><i class="fa-solid fa-xmark"></i></button>`;
   document.getElementById('toastStack').appendChild(el);
   setTimeout(()=>rmToast(el),4500);
 }

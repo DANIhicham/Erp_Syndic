@@ -12,6 +12,7 @@ class Document extends Model
         'type_document',
         'residence_id',
         'appartement_id',
+        'transaction_paiement_id',
         'date_upload'
     ];
 
@@ -20,6 +21,11 @@ class Document extends Model
     public function residence()
     {
         return $this->belongsTo(Residence::class);
+    }
+
+        public function transaction()
+    {
+        return $this->belongsTo(TransactionPaiement::class, 'transaction_paiement_id');
     }
 
     public function appartement()

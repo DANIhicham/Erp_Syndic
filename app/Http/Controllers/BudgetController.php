@@ -27,8 +27,11 @@ class BudgetController extends Controller
 
             $montantAnnuel = $budget->montant_annuel_fixe ?? 0;
 
-            // Nombre appartements
-            $nbAppartements = Appartement::where('residence_id', $residenceId)->count();
+            $nbAppartements = Appartement::where('residence_id', $residenceId)
+            ->whereHas('paiementCotisation', function ($query) use ($annee) {
+                $query->where('annee_concernee', $annee);
+            })
+            ->count();
 
             // Total prévu
             $totalPrevu = $montantAnnuel * $nbAppartements;
@@ -37,6 +40,28 @@ class BudgetController extends Controller
             $totalEncaisse = PaiementCotisation::where('annee_concernee', $annee)
                 ->whereHas('appartement', fn($q) => $q->where('residence_id', $residenceId))
                 ->sum('montant_paye');
+
+
+            $nbPayes = PaiementCotisation::where('annee_concernee', $annee)
+                ->where('statut', 'payé')
+                ->whereHas('appartement', function ($q) use ($residenceId) {
+                    $q->where('residence_id', $residenceId);
+                })
+                ->count();
+
+            $nbPartiels = PaiementCotisation::where('annee_concernee', $annee)
+                ->where('statut', 'partiel')
+                ->whereHas('appartement', function ($q) use ($residenceId) {
+                    $q->where('residence_id', $residenceId);
+                })
+                ->count();
+
+            $nbImpayes = PaiementCotisation::where('annee_concernee', $annee)
+                ->where('statut', 'en_retard')
+                ->whereHas('appartement', function ($q) use ($residenceId) {
+                    $q->where('residence_id', $residenceId);
+                })
+                ->count();
 
             // Dépenses
             $totalDepenses = DepenseResidence::where('residence_id', $residenceId)
@@ -58,6 +83,9 @@ class BudgetController extends Controller
                 'totalEncaisse',
                 'totalDepenses',
                 'solde',
+                'nbPayes',
+                'nbPartiels',
+                'nbImpayes',
                 'taux'
             ));
         }

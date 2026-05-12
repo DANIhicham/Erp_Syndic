@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CotisationController;
+use App\Http\Controllers\CoproprietaireController;
+use App\Http\Controllers\ReclamationController;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -30,9 +33,6 @@ Route::get('/dashboard_syndic', function () {
     return view('syndic.dashboard_syndic'); 
 })->name('dashboard_syndic');
 
-Route::get('/cotisations', function () {
-    return view('syndic.cotisations'); 
-})->name('cotisations');
 
 Route::get('/charges_depenses', function () {
     return view('syndic.depenses'); 
@@ -41,13 +41,19 @@ Route::get('/charges_depenses', function () {
 Route::get('/budget_annuel', [BudgetController::class, 'index'])->name('budget.index');
 Route::post('/budget_annuel', [BudgetController::class, 'store'])->name('budget.store');
 
-Route::get('/coproprietaires', function () {
-    return view('syndic.coproprietaires');  
-})->name('Coproprietaires');
 
-Route::get('/reclamations', function () {
-    return view('syndic.reclamations');  
-})->name('Reclamations');
+// 📊 Liste cotisations   
+Route::get('/cotisations', [CotisationController::class, 'index'])
+->name('cotisations.index');
+
+// 💰 Enregistrer paiement
+ Route::post('/cotisations/payer', [CotisationController::class, 'payer'])
+->name('cotisations.payer');
+
+// 📜 Historique (AJAX modal)
+Route::get('/cotisations/historique/{appartement}', [CotisationController::class, 'historique'])
+->name('cotisations.historique');
+
 //fin partie synic
 
 
@@ -73,6 +79,8 @@ Route::get('/resident_dashboard', function () {
     return view('resident.resident_dash');
 })->name('resident_dash');
 
+
+
 //-----------------------IMPORT USERS-----------------------------------------------
 
 // use Maatwebsite\Excel\Facades\Excel;
@@ -95,8 +103,55 @@ Route::get('/resident_dashboard', function () {
 //     return "Import appartements terminé";
 // });
 
+
+Route::prefix('syndic')->name('syndic.')->middleware(['auth'])->group(function () {
+ 
+    // ── Cotisations ──────────────────────────────────────────────
+    Route::prefix('cotisations')->name('cotisations.')->group(function () {
+ 
+        // Page principale (avec filtres GET)
+        Route::get('/',         [CotisationController::class, 'index'])            ->name('index');
+ 
+        // Enregistrer un paiement (POST + upload fichier)
+        Route::post('/payer',   [CotisationController::class, 'payer'])            ->name('payer');
+ 
+        // Historique des transactions d'un appartement (AJAX/JSON)
+        Route::get('/historique/{appartement}', [CotisationController::class, 'historique']) ->name('historique');
+ 
+        // Supprimer une transaction
+        Route::delete('/transaction/{id}',      [CotisationController::class, 'supprimerTransaction']) ->name('supprimer');
+ 
+        // Export CSV
+        Route::get('/export-csv',  [CotisationController::class, 'exportCsv'])    ->name('export');
+ 
+        // Relancer un propriétaire par email
+        Route::post('/relancer/{appartement}',  [CotisationController::class, 'relancer'])   ->name('relancer');
+        //telechargement de recu
+        Route::get('/recu/{transaction}',[CotisationController::class, 'recu'])  ->name('recu');
+
+    });
+ 
+});
+
+
+// Liste des copropriétaires
+Route::get('/coproprietaires', [CoproprietaireController::class, 'index'])
+->name('coproprietaires.index');
+
 Route::post('/set-residence', function (Request $request) {
     session(['residence_id' => $request->residence_id]);
     return back();
 })->name('set.residence');
+
+// RECLAMATIONS
+
+Route::get('/reclamations', [ReclamationController::class, 'index'])
+    ->name('reclamations.index');
+
+Route::post('/reclamations/store', [ReclamationController::class, 'store'])
+    ->name('reclamations.store');
+
+Route::put('/reclamations/{id}/status', [ReclamationController::class, 'updateStatus'])
+    ->name('reclamations.updateStatus');
+
 require __DIR__.'/auth.php';

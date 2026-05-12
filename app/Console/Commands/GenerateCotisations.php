@@ -14,14 +14,14 @@ class GenerateCotisations extends Command
      *
      * @var string
      */
-    protected $signature = 'app:generate-cotisations';
+    protected $signature = 'generate:cotisations';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Générer les cotisations automatiquement';
 
     /**
      * Execute the console command.
