@@ -13,6 +13,7 @@ class Document extends Model
         'residence_id',
         'appartement_id',
         'transaction_paiement_id',
+        'paiement_depense_id',
         'date_upload'
     ];
 
@@ -33,6 +34,10 @@ class Document extends Model
         return $this->belongsTo(Appartement::class);
     }
 
+    public function paiementDepense()
+    {
+        return $this->belongsTo(PaiementDepense::class, 'paiement_depense_id');
+    }
     // Helper pour obtenir l'URL complète du fichier
     public function getFileUrlAttribute()
     {

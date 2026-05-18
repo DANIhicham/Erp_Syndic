@@ -307,7 +307,7 @@
                 @if($apt['last_transaction_id'])
                     <a
                         href="{{ route('syndic.cotisations.recu', $apt['last_transaction_id']) }}"
-                        target="_blank"
+                        
                         class="ra-btn download"
                         title="Télécharger reçu"
                     >
@@ -565,7 +565,7 @@
 <script>
 /* ── Config CSRF ────────────────────────────────────────────────── */
 const CSRF = '{{ csrf_token() }}';
-const BASE = '{{ url("/syndic/cotisations") }}';
+const BASE = '{{ url("/cotisations") }}';
 
 /* ── Helpers ────────────────────────────────────────────────────── */
 const fmt = n => Number(n).toLocaleString('fr-FR', {minimumFractionDigits:0}) + ' MAD';
@@ -806,7 +806,7 @@ function renderHistorique(data) {
             <div style="font-size:11px;color:var(--text-4)">Reste</div>
             <div style="font-weight:700;color:${data.reste > 0 ? 'var(--red-t)' : 'var(--text-4)'}">${fmt(data.reste)}</div>
           </div>
-          <span class="s-badge ${badgeCls}">${data.statut === 'payé' ? 'Payé' : data.statut === 'partiel' ? 'Partiel' : 'En retard'}</span>
+          
         </div>
         <div style="height:4px;background:#f1f5f9;border-radius:2px;margin-top:10px;overflow:hidden">
           <div style="height:100%;border-radius:2px;width:${pct}%;background:linear-gradient(90deg,var(--green),#4ade80);transition:width .8s ease"></div>

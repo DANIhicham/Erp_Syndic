@@ -7,7 +7,7 @@
       <div class="page-header">
         <div class="ph-left">
           <h2>Budget Annuel</h2>
-          <p>Bilan financier —  2026</p>
+          <p>Bilan financier —  {{$annee}}</p>
         </div>
         <div class="ph-right">
           <select onchange="window.location.href='?annee='+this.value" class="filter-select"><option>Année</option><option>2026</option><option>2025</option><option>2024</option></select>

@@ -19,6 +19,10 @@ return new class extends Migration
             $table->foreignId('residence_id')->constrained('residences')->onDelete('cascade');
             $table->foreignId('appartement_id')->nullable()->constrained('appartements')->onDelete('cascade');
             $table->dateTime('date_upload')->useCurrent();
+            $table->foreignId('paiement_depense_id')
+            ->nullable()
+            ->constrained('paiement_depenses')
+            ->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -77,9 +77,7 @@
 
 <body>
 
-    <button class="print-btn" onclick="window.print()">
-        Télécharger PDF
-    </button>
+    
 
     <div class="header">
         <h1>RESIDENCE {{ strtoupper($residence->nom ?? 'SYNDIC') }}</h1>

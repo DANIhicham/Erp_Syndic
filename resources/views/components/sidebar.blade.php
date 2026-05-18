@@ -27,7 +27,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/cotisations') }}" class="nav-link {{ Request::is('cotisations*') ? 'active' : '' }}">
+                    <a href="{{ route('syndic.cotisations.index') }}" class="nav-link {{ Request::is('cotisations*') ? 'active' : '' }}">
                         <span class="nav-icon">
                             <i class="fa-solid fa-coins"></i>
                         </span>
@@ -36,7 +36,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/charges_depenses') }}" class="nav-link {{ Request::is('charges_depenses*') ? 'active' : '' }}">
+                    <a href="{{ route('depenses.index') }}" class="nav-link {{ Request::is('depenses*') ? 'active' : '' }}">
                         <span class="nav-icon">
                             <i class="fa-solid fa-receipt"></i>
                         </span>
@@ -44,7 +44,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/budget_annuel') }}" class="nav-link {{ Request::is('budget*') ? 'active' : '' }}">
+                    <a href="{{ route('budget.index') }}" class="nav-link {{ Request::is('budget*') ? 'active' : '' }}">
                         <span class="nav-icon">
                             <i class="fa-solid fa-scale-balanced"></i>
                         </span>
@@ -52,7 +52,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/coproprietaires') }}" class="nav-link {{ Request::is('coproprietaires*') ? 'active' : '' }}">
+                    <a href="{{ route('coproprietaires.index') }}" class="nav-link {{ Request::is('coproprietaires*') ? 'active' : '' }}">
                         <span class="nav-icon">
                             <i class="fa-solid fa-users"></i>
                         </span>
@@ -61,7 +61,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/reclamations') }}" class="nav-link {{ Request::is('reclamations*') ? 'active' : '' }}">
+                    <a href="{{ route('reclamations.index') }}" class="nav-link {{ Request::is('reclamations*') ? 'active' : '' }}">
                         <span class="nav-icon">
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </span>

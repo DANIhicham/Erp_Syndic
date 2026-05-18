@@ -66,7 +66,7 @@ class BudgetController extends Controller
             // Dépenses
             $totalDepenses = DepenseResidence::where('residence_id', $residenceId)
                 ->whereYear('date_debut', $annee)
-                ->sum('montant_reel');
+                ->sum('montant');
 
             // Solde
             $solde = $totalEncaisse - $totalDepenses;

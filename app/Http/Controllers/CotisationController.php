@@ -12,6 +12,7 @@ use App\Models\PaiementCotisation;
 use App\Models\ConfigurationBudget;
 use App\Models\Document;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CotisationController extends Controller
 {
@@ -223,7 +224,6 @@ class CotisationController extends Controller
 
         $reste = max(0, $montantAttendu - $totalPaye);
 
-        $statut = $this->computeStatut($totalPaye, $montantAttendu);
 
         // ── Formatage transactions ────────────────────────────────
         $transactionsFormatees = $transactions->map(function ($t) {
@@ -260,7 +260,7 @@ class CotisationController extends Controller
             'montant_annuel' => $montantAttendu,
             'total_paye'     => $totalPaye,
             'reste'          => $reste,
-            'statut'         => $statut,
+            
 
             'transactions'   => $transactionsFormatees,
         ]);
@@ -381,7 +381,6 @@ class CotisationController extends Controller
 
         $montantPaye  = (float) $apt->transactions->sum('montant');
         $reste        = max(0, $montantAttendu - $montantPaye);
-        $statut       = $this->computeStatut($montantPaye, $montantAttendu);
 
         // ── Date début couverture ─────────────────────────────
         $dateSignature = $apt->date_signature_contrat
@@ -427,6 +426,12 @@ class CotisationController extends Controller
             $dateEcheance = $dateEcheance->format('d/m/Y');
         }
 
+        $statut = $this->computeStatut(
+            $montantPaye,
+            $montantAttendu,
+            $dateEcheance ? Carbon::createFromFormat('d/m/Y', $dateEcheance) : null
+        );
+
         // Initiales avatar
         $proprietaire = $apt->proprietaire;
         $initiales    = $proprietaire
@@ -445,7 +450,9 @@ class CotisationController extends Controller
             'montant_paye'    => $montantPaye,
             'reste'           => $reste,
             'statut'          => $statut,
-            'date_echeance'   => $dateEcheance,
+            'date_echeance' => $statut === 'payé'
+            ? null
+            : $dateEcheance,
             'jours_couverts' => $joursCouverts,
             'nb_transactions' => $apt->transactions->count(),
             'proprietaire_id' => $apt->proprietaire_id,
@@ -453,12 +460,40 @@ class CotisationController extends Controller
         ];
     }
 
-    private function computeStatut(float $paye, float $attendu): string
-    {
-        if ($attendu <= 0)      return 'en_attente';
-        if ($paye <= 0)         return 'en_retard';
-        if ($paye < $attendu)   return 'partiel';
-        return 'payé';
+    private function computeStatut(
+        float $paye,
+        float $attendu,
+        ?Carbon $dateEcheance = null
+    ): string {
+
+        // Aucun budget configuré
+        if ($attendu <= 0) {
+            return 'en_attente';
+        }
+
+        // Totalement payé
+        if ($paye >= $attendu) {
+            return 'payé';
+        }
+
+        // Rien payé
+        if ($paye <= 0) {
+
+            // Si date dépassée => retard
+            if ($dateEcheance && now()->gt($dateEcheance)) {
+                return 'en_retard';
+            }
+
+            return 'en_retard';
+        }
+
+        // Paiement partiel avec couverture encore valide
+        if ($dateEcheance && now()->lte($dateEcheance)) {
+            return 'partiel';
+        }
+
+        // Couverture expirée
+        return 'en_retard';
     }
 
     private function computeStats($appartements): array
@@ -484,24 +519,24 @@ class CotisationController extends Controller
 
         $appartement  = $transaction->appartement;
         $proprietaire = $appartement->proprietaire;
-        $residence = $appartement->residence;
-        $annee = $transaction->annee;
+        $residence    = $appartement->residence;
+        $annee        = $transaction->annee;
 
-        // ── Cotisation ───────────────────────────────────────
+        // ── Cotisation ─────────────────────────────
         $cotisation = PaiementCotisation::where('appartement_id', $appartement->id)
             ->where('annee_concernee', $annee)
             ->first();
 
         $montantAttendu = (float) ($cotisation?->montant_attendu ?? 0);
 
-        // ── Total payé ───────────────────────────────────────
+        // ── Total payé ─────────────────────────────
         $totalPaye = TransactionPaiement::where('appartement_id', $appartement->id)
             ->where('annee', $annee)
             ->sum('montant');
 
         $reste = max(0, $montantAttendu - $totalPaye);
 
-        // ── Calcul période ───────────────────────────────────
+        // ── Calcul période ─────────────────────────
         $dateSignature = $appartement->date_signature_contrat
             ? Carbon::parse($appartement->date_signature_contrat)
             : Carbon::create($annee, 1, 1);
@@ -526,7 +561,8 @@ class CotisationController extends Controller
             ? $dateDebut->copy()->addDays($joursCouverts - 1)
             : $dateDebut;
 
-        return view('syndic.recu-cotisation', [
+        // ── Génération PDF ─────────────────────────
+        $pdf = Pdf::loadView('syndic.recu-cotisation', [
             'transaction'      => $transaction,
             'appartement'      => $appartement,
             'residence'        => $residence,
@@ -536,6 +572,8 @@ class CotisationController extends Controller
             'reste'            => $reste,
             'dateDebut'        => $dateDebut,
             'dateFin'          => $dateFin,
-        ]);
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download('recu-'.$transaction->id.'.pdf');
     }
 }
