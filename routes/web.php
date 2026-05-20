@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ResidentDashboardController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\CoproprietaireController;
+use App\Http\Controllers\DashboardSyndicController;
 use App\Http\Controllers\ReclamationController;
 use App\Http\Controllers\DepenseResidenceController;
 use Illuminate\Http\Request;
@@ -37,9 +39,9 @@ Route::middleware(['auth', 'role:syndic'])->group(function () {
     return back();
     })->name('set.residence');
 
-    Route::get('/dashboard_syndic', function () {
-        return view('syndic.dashboard_syndic'); 
-    })->name('dashboard_syndic');
+    //--Dashboard-------------------------------------------------
+    Route::get('/dashboard_syndic', [DashboardSyndicController::class, 'index'])
+    ->name('dashboard.syndic');
 
     // ── Cotisations ──────────────────────────────────────────────
     Route::prefix('cotisations')->name('syndic.cotisations.')->group(function () {
@@ -112,13 +114,18 @@ Route::middleware(['auth', 'role:syndic'])->group(function () {
 
 
 //partie resident
-Route::get('/resident_dashboard', function () {
-    return view('resident.resident_dash');
-})->name('resident_dash');
 
+Route::middleware(['auth', 'role:proprietaire'])->group(function () {
 
+    // Dashboard
+    Route::get('/resident_dashboard', [ResidentDashboardController::class, 'index'])
+        ->name('resident.dashboard');
 
+    // Réclamations
+    Route::post('/reclamations', [ResidentDashboardController::class, 'storeReclamation'])
+        ->name('resident.reclamations.store');
 
+});
 
 
 //-----------------------IMPORT USERS-----------------------------------------------
@@ -134,14 +141,14 @@ Route::get('/resident_dashboard', function () {
 
 //-----------------------IMPORT APPARTEMENTS----------------------------------------
 
-// use App\Imports\AppartementsImport;
-// use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\AppartementsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
-// Route::get('/import-appartements', function () {
-//     Excel::import(new AppartementsImport, public_path('appartements.xlsx'));
+Route::get('/import-appartements', function () {
+    Excel::import(new AppartementsImport, public_path('appartements.xlsx'));
 
-//     return "Import appartements terminé";
-// });
+    return "Import appartements terminé";
+});
 
 
 

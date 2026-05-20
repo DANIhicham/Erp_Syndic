@@ -4,8 +4,11 @@
         <div class="brand-icon">
             <i class="fa-solid fa-building-columns"></i>
         </div>
+        @php
+            $residenceActive = $residences->firstWhere('id', session('residence_id'));
+        @endphp
         <div class="brand-text">
-            <span class="brand-name">BLIVING</span>
+            <span class="brand-name">{{ $residenceActive->nom }}</span>
             <span class="brand-tag">ERP Gestion</span>
         </div>
         <button class="sidebar-toggle d-lg-none" id="sidebarClose">
@@ -32,7 +35,7 @@
                             <i class="fa-solid fa-coins"></i>
                         </span>
                         <span class="nav-text">Cotisations</span>
-                        <span class="nav-badge danger" id="nb-cot">3</span>
+                        <!-- <span class="nav-badge danger" id="nb-cot">3</span> -->
                     </a>
                 </li>
                 <li class="nav-item">
@@ -57,7 +60,7 @@
                             <i class="fa-solid fa-users"></i>
                         </span>
                         <span class="nav-text">Copropriétaires</span>
-                        <span class="nav-count">8</span>
+                        <!-- <span class="nav-count">8</span> -->
                     </a>
                 </li>
                 <li class="nav-item">
@@ -66,7 +69,9 @@
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </span>
                         <span class="nav-text">Réclamations</span>
-                        <span class="nav-badge danger" id="nb-recl">2</span>
+                        @if($nbReclamationsOuvertes > 0)
+                        <span class="nav-badge danger" id="nb-recl">{{ $nbReclamationsOuvertes }}</span>
+                         @endif
                     </a>
                 </li>
             </ul>

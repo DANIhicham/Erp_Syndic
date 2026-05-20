@@ -173,7 +173,21 @@ class CotisationController extends Controller
             $cotisation->user_id         = auth()->id();
             $cotisation->montant_paye    = $totalPaye;
             $cotisation->montant_attendu = $montantMax;
-            $cotisation->statut          = $this->computeStatut($totalPaye, $montantMax);
+            $appartement = Appartement::find($request->appartement_id);
+
+            $coverage = $this->calculateCoverage(
+                $appartement,
+                $request->annee,
+                $montantMax,
+                $totalPaye
+            );
+
+            $cotisation->statut = $this->computeStatut(
+                $totalPaye,
+                $montantMax,
+                $coverage['date_echeance'],
+                $request->annee
+            );
             $cotisation->save();
 
             DB::commit();
@@ -209,7 +223,7 @@ class CotisationController extends Controller
         $transactions = TransactionPaiement::where('appartement_id', $appartementId)
             ->where('annee', $annee)
             ->with('documents')
-            ->orderBy('date_paiement', 'desc')
+            ->orderBy('date_paiement', 'asc')
             ->get();
 
         // ── Cotisation attendue ────────────────────────────────────
@@ -291,13 +305,26 @@ class CotisationController extends Controller
             $montantMax  = $config ? (float) $config->montant_annuel_fixe : 0;
             $totalPaye   = TransactionPaiement::where('appartement_id', $aptId)
                                               ->where('annee', $annee)->sum('montant');
+            
+            $appartement = Appartement::find($aptId);
+
+            $coverage = $this->calculateCoverage(
+                $appartement,
+                $annee,
+                $montantMax,
+                $totalPaye
+            );
 
             PaiementCotisation::updateOrCreate(
                 ['appartement_id' => $aptId, 'annee_concernee' => $annee],
                 [
                     'montant_paye'    => $totalPaye,
                     'montant_attendu' => $montantMax,
-                    'statut'          => $this->computeStatut($totalPaye, $montantMax),
+                    'statut' => $this->computeStatut(
+                        $totalPaye,
+                        $montantMax,
+                        $coverage['date_echeance']
+                    ),
                 ]
             );
 
@@ -382,55 +409,30 @@ class CotisationController extends Controller
         $montantPaye  = (float) $apt->transactions->sum('montant');
         $reste        = max(0, $montantAttendu - $montantPaye);
 
-        // ── Date début couverture ─────────────────────────────
-        $dateSignature = $apt->date_signature_contrat
-            ? Carbon::parse($apt->date_signature_contrat)
-            : Carbon::create($annee, 1, 1);
+        $coverage = $this->calculateCoverage(
+            $apt,
+            $annee,
+            $montantAttendu,
+            $montantPaye
+        );
 
-        $anneeSignature = $dateSignature->year;
-
-        // Première année = commence à la date signature
-        $dateDebut = $annee == $anneeSignature
-            ? $dateSignature->copy()
-            : Carbon::create($annee, 1, 1);
-
-        // Fin période théorique
-        $dateFinTheorique = Carbon::create($annee, 12, 31);
-
-        // Nombre réel de jours à couvrir
-        $joursPeriode = $dateDebut->diffInDays($dateFinTheorique) + 1;
-
-        // Coût journalier réel
-        $coutJournalier = $joursPeriode > 0
-            ? $montantAttendu / $joursPeriode
-            : 0;
-
-        // Jours couverts par le paiement
-        $joursCouverts = $coutJournalier > 0
-            ? floor($montantPaye / $coutJournalier)
-            : 0;
-
-        // Date échéance
-        $dateEcheance = null;
-
-        if ($joursCouverts > 0) {
-
-            $dateEcheance = $dateDebut->copy()
-                ->addDays($joursCouverts - 1);
-
-            // Ne jamais dépasser fin année
-            if ($dateEcheance->gt($dateFinTheorique)) {
-                $dateEcheance = $dateFinTheorique->copy();
-            }
-
-            $dateEcheance = $dateEcheance->format('d/m/Y');
-        }
+        $dateEcheance = $coverage['date_echeance'];
+        $joursCouverts = $coverage['jours_couverts'];
 
         $statut = $this->computeStatut(
             $montantPaye,
             $montantAttendu,
-            $dateEcheance ? Carbon::createFromFormat('d/m/Y', $dateEcheance) : null
+            $dateEcheance,
+            $annee
         );
+
+        // Synchronisation DB
+        if ($cotisation && $cotisation->statut !== $statut) {
+            $cotisation->update([
+                'statut' => $statut,
+                'montant_paye' => $montantPaye
+            ]);
+            }
 
         // Initiales avatar
         $proprietaire = $apt->proprietaire;
@@ -452,7 +454,7 @@ class CotisationController extends Controller
             'statut'          => $statut,
             'date_echeance' => $statut === 'payé'
             ? null
-            : $dateEcheance,
+            : ($dateEcheance ? $dateEcheance->format('d/m/Y') : null),
             'jours_couverts' => $joursCouverts,
             'nb_transactions' => $apt->transactions->count(),
             'proprietaire_id' => $apt->proprietaire_id,
@@ -460,13 +462,68 @@ class CotisationController extends Controller
         ];
     }
 
+    private function calculateCoverage(
+    Appartement $apt,
+    int $annee,
+    float $montantAttendu,
+    float $montantPaye
+    ): array {
+
+        // ── Date signature ─────────────────────────
+        $dateSignature = $apt->date_signature_contrat
+            ? Carbon::parse($apt->date_signature_contrat)
+            : Carbon::create($annee, 1, 1);
+
+        $anneeSignature = $dateSignature->year;
+
+        // ── Début période ──────────────────────────
+        $dateDebut = $annee == $anneeSignature
+            ? $dateSignature->copy()
+            : Carbon::create($annee, 1, 1);
+
+        $dateFinTheorique = Carbon::create($annee, 12, 31);
+
+        // ── Nombre jours réels ─────────────────────
+        $joursPeriode = $dateDebut->diffInDays($dateFinTheorique) + 1;
+
+        // ── Coût journalier ────────────────────────
+        $coutJournalier = $joursPeriode > 0
+            ? $montantAttendu / $joursPeriode
+            : 0;
+
+        // ── Jours couverts ─────────────────────────
+        $joursCouverts = $coutJournalier > 0
+            ? floor($montantPaye / $coutJournalier)
+            : 0;
+
+        $dateEcheance = null;
+
+        if ($joursCouverts > 0) {
+
+            $dateEcheance = $dateDebut->copy()
+                ->addDays($joursCouverts - 1);
+
+            if ($dateEcheance->gt($dateFinTheorique)) {
+                $dateEcheance = $dateFinTheorique->copy();
+            }
+        }
+
+        return [
+            'date_echeance' => $dateEcheance,
+            'jours_couverts' => $joursCouverts,
+        ];
+    }
+
     private function computeStatut(
         float $paye,
         float $attendu,
-        ?Carbon $dateEcheance = null
+        ?Carbon $dateEcheance = null,
+        ?int $annee = null
     ): string {
 
-        // Aucun budget configuré
+        $anneeCourante = now()->year;
+
+        // Aucun budget
         if ($attendu <= 0) {
             return 'en_attente';
         }
@@ -476,18 +533,24 @@ class CotisationController extends Controller
             return 'payé';
         }
 
-        // Rien payé
-        if ($paye <= 0) {
+        // ── ANNÉE FUTURE ─────────────────────────
+        if ($annee && $annee > $anneeCourante) {
 
-            // Si date dépassée => retard
-            if ($dateEcheance && now()->gt($dateEcheance)) {
-                return 'en_retard';
+            if ($paye > 0) {
+                return 'partiel';
             }
 
+            return 'en_attente';
+        }
+
+        // ── ANNÉE COURANTE / PASSÉE ──────────────
+
+        // Aucun paiement
+        if ($paye <= 0) {
             return 'en_retard';
         }
 
-        // Paiement partiel avec couverture encore valide
+        // Couverture encore valide
         if ($dateEcheance && now()->lte($dateEcheance)) {
             return 'partiel';
         }

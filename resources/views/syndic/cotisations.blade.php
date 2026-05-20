@@ -4,13 +4,6 @@
 @section('page_title', 'Cotisations')
 
 @section('content')
-{{--
-    ╔══════════════════════════════════════════════════════════════
-    ║  cotisations.blade.php — Page Cotisations Syndic
-    ║  Toutes les classes CSS viennent du design system existant.
-    ║  Aucune nouvelle classe n'est créée.
-    ╚══════════════════════════════════════════════════════════════
---}}
 
 {{-- ── PAGE HEADER ─────────────────────────────────────────────── --}}
 <div class="page-header">
@@ -62,7 +55,7 @@
           {{ number_format($stats['encaissé'], 0, ',', ' ') }}
           <small style="font-size:13px;font-weight:500;color:var(--text-4)">MAD</small>
         </div>
-        <div class="kpi-sub">{{ $stats['payes'] }} copropriétaires soldés</div>
+        <div class="kpi-sub">{{ $stats['payes'] }} copropriétaires soldés tout</div>
       </div>
       <div class="kpi-icon blue"><i class="fa-solid fa-check-circle"></i></div>
     </div>
@@ -350,7 +343,7 @@
   </div>
 </div>
 
-@endsection
+
 
 
 {{-- ══════════════════════════════════════════════════════════════
@@ -556,7 +549,7 @@
 </div>
 
 
-
+@endsection
 
 {{-- ══════════════════════════════════════════════════════════════
      JAVASCRIPT

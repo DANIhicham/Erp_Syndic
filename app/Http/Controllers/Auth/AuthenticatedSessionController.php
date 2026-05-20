@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended('/dashboard_syndic');
         }
 
-        return redirect()->intended('/proprietaire/dashboard');
+        return redirect()->intended('/resident_dashboard');
     }
 
     /**
@@ -52,6 +52,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

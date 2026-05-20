@@ -97,7 +97,7 @@
         @php
             $typeClass = match($alerte['type']) {
                 'danger' => 'late',
-                'en_attente' => 'soon',
+                'warning' => 'soon',
                 default => $alerte['type'],
             };
         @endphp

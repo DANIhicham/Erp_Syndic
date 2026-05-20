@@ -70,7 +70,7 @@
             </div>
 
             <!-- OPTIONS -->
-            <div class="form-options">
+            <!-- <div class="form-options">
                 <label class="checkbox-group">
                     <input type="checkbox" name="remember">
                     <span>Se souvenir de moi</span>
@@ -81,7 +81,7 @@
                         Mot de passe oublié ?
                     </a>
                 @endif
-            </div>
+            </div> -->
 
             <!-- SUBMIT -->
             <button type="submit" class="btn-submit">

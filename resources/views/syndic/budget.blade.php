@@ -20,7 +20,7 @@
       <div class="bilan-row">
         <div class="bilan-block" style="border-top:3px solid var(--green)">
           <div class="bilan-icon" style="background:var(--green-bg);color:var(--green-t)"><i class="fa-solid fa-arrow-trend-up"></i></div>
-          <div class="bilan-val" style="color:var(--green-t)">{{ number_format($totalPrevu, 0, ',', ' ') }} MAD</div>
+          <div class="bilan-val" style="color:var(--green-t)">{{ number_format($totalEncaisse, 0, ',', ' ') }} MAD</div>
           <div class="bilan-lbl">Total Cotisations Prévu</div>
         </div>
         <div class="bilan-block" style="border-top:3px solid var(--red)">

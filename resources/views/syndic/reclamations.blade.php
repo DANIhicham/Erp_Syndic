@@ -16,7 +16,7 @@
       <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
         <div class="kpi-card kpi-red" style="animation-delay:.05s"><div class="kpi-top"><div><div class="kpi-label">Ouvertes</div><div class="kpi-value"> {{ $stats['ouvertes'] }}</div><div class="kpi-sub"><span class="kpi-badge-alert"><i class="fa-solid fa-fire"></i> {{ $stats['urgentes'] }}  urgentes</span></div></div><div class="kpi-icon red"><i class="fa-solid fa-circle-exclamation"></i></div></div></div>
         <div class="kpi-card kpi-orange" style="animation-delay:.1s"><div class="kpi-top"><div><div class="kpi-label">En cours</div><div class="kpi-value">{{ $stats['en_cours'] }}</div><div class="kpi-sub">Technicien mandaté</div></div><div class="kpi-icon orange"><i class="fa-solid fa-spinner"></i></div></div></div>
-        <div class="kpi-card kpi-green" style="animation-delay:.15s"><div class="kpi-top"><div><div class="kpi-label">Résolues</div><div class="kpi-value">{{ $stats['resolues'] }}</div><div class="kpi-sub">Ce mois</div></div><div class="kpi-icon green"><i class="fa-solid fa-check-circle"></i></div></div></div>
+        <div class="kpi-card kpi-green" style="animation-delay:.15s"><div class="kpi-top"><div><div class="kpi-label">Résolues</div><div class="kpi-value">{{ $stats['resolues'] }}</div><div class="kpi-sub">Cet Année</div></div><div class="kpi-icon green"><i class="fa-solid fa-check-circle"></i></div></div></div>
 
       </div>
 

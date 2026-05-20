@@ -25,11 +25,12 @@
                         {{ $residence->nom }}
                     </option>
                 @endforeach
+                <i class="fa-solid fa-chevron-down rs-arrow"></i>
             </select>
         </form>
-        <i class="fa-solid fa-chevron-down rs-arrow"></i>
+        
       </div>
-      <button class="action-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button>
+      <!-- <button class="action-btn"><i class="fa-solid fa-bell"></i><span class="notif-dot"></span></button> -->
       <!-- <button class="user-toggle">
         <div class="user-avatar">AM</div>
         <div class="d-none d-md-block"><span class="u-name">Ahmed M.</span><span class="u-role">Administrateur</span></div>

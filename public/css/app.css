@@ -531,9 +531,11 @@ a{text-decoration:none}
 @keyframes toastOut{to{opacity:0;transform:translateX(32px)}}
 .toast-body{flex:1}
 .toast-title{font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:1px}
+.toast-title.paid{background:var(--green-bg);color:var(--green-t)}
 .toast-msg{font-size:12px;color:var(--text-3)}
 .toast-close{width:24px;height:24px;border-radius:5px;border:none;background:none;color:#94a3b8;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;font-size:12px}
 .toast-close:hover{background:#f1f5f9}
+.paid{background:var(--green-bg);color:var(--green-t)}
 
 /* ── ANIMATIONS ────────────────────────────────────────────────── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
