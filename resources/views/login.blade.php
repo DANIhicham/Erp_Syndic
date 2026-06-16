@@ -22,7 +22,7 @@
             <div class="logo-icon">
                 <i class="fa-solid fa-building-columns"></i>
             </div>
-            <h1 class="brand-title">BLIVING OFFICE</h1>
+            <h1 class="brand-title">LIVING FACILITY</h1>
             <p class="brand-subtitle">ERP Gestion</p>
         </div>
 

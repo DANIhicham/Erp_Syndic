@@ -157,7 +157,7 @@
               </td>
               <td><span class="amount-main">3 800 MAD</span><span class="amount-caution">Caution: 7 600 MAD</span></td>
               <td><span class="s-badge renouveler">Résidentiel</span></td>
-              <td><span class="s-badge actif">Actif</span></td>
+              <td><span class="s-badge paid">Actif</span></td>
               <td onclick="event.stopPropagation()">
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(0)"><i class="fa-solid fa-eye"></i></button>

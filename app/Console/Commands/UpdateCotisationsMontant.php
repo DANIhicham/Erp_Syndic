@@ -27,143 +27,114 @@ class UpdateCotisationsMontant extends Command
 
     /**
      * Execute the console command.
-     */
+     **/
+
     public function handle()
-    {
-        $cotisations = PaiementCotisation::all();
+        {
+            $residenceId = $this->argument('residence_id');
+            $anneeActuelle = now()->year;
 
-        foreach ($cotisations as $cotisation) {
+            $appartementsQuery = Appartement::query();
 
-            $appartement = Appartement::find($cotisation->appartement_id);
-
-            // Ignorer résidence ID = 1
-            if (!$appartement || $appartement->residence_id == 1) {
-                continue;
+            if ($residenceId) {
+                $appartementsQuery->where('residence_id', $residenceId);
             }
 
-            $budget = ConfigurationBudget::where('residence_id', $appartement->residence_id)
-                ->where('annee', $cotisation->annee_concernee)
-                ->first();
+            $appartements = $appartementsQuery->get();
 
-            if (!$budget) {
+            foreach ($appartements as $appartement) {
 
-                $this->warn(
-                    "Budget manquant pour appartement {$appartement->id}"
-                );
+                if (!$appartement->date_signature_contrat) {
+                    continue;
+                }
 
-                continue;
-            }
+                $dateSignature = Carbon::parse($appartement->date_signature_contrat);
+                $anneeDebut = $dateSignature->year;
 
-            $montantAnnuel = (float) $budget->montant_annuel_fixe;
+                // ─────────────────────────────
+                // 1. CREATE SI MANQUANT
+                // ─────────────────────────────
 
-            $dateSignature = Carbon::parse($appartement->date_signature_contrat);
-            $anneeDebut = $dateSignature->year;
+                for ($annee = $anneeDebut; $annee <= $anneeActuelle; $annee++) {
 
-            // ─────────────────────────────────────
-            // PRORATA
-            // ─────────────────────────────────────
+                    $cotisation = PaiementCotisation::firstOrNew([
+                        'appartement_id'   => $appartement->id,
+                        'annee_concernee'  => $annee,
+                    ]);
 
-            if ($cotisation->annee_concernee == $anneeDebut) {
+                    $budget = ConfigurationBudget::where('residence_id', $appartement->residence_id)
+                        ->where('annee', $annee)
+                        ->first();
 
-                $debut = $dateSignature->copy();
-                $fin = Carbon::create($anneeDebut, 12, 31);
+                    $montantAnnuel = $budget
+                        ? (float) $budget->montant_annuel_fixe
+                        : 0;
 
-                $joursRestants = $debut->diffInDays($fin) + 1;
-                $joursAnnee = $fin->dayOfYear;
+                    // PRORATA
+                    if ($annee == $anneeDebut) {
 
-                $montant = $joursAnnee > 0
-                    ? ($montantAnnuel / $joursAnnee) * $joursRestants
-                    : 0;
+                        $debut = $dateSignature->copy();
+                        $fin = Carbon::create($annee, 12, 31);
 
-            } else {
+                        $joursRestants = $debut->diffInDays($fin) + 1;
+                        $joursAnnee = $fin->dayOfYear;
 
-                $montant = $montantAnnuel;
-            }
+                        $montantAttendu = $joursAnnee > 0
+                            ? ($montantAnnuel / $joursAnnee) * $joursRestants
+                            : 0;
 
-            $montantAttendu = round($montant, 2);
+                    } else {
+                        $montantAttendu = $montantAnnuel;
+                    }
 
-            // ─────────────────────────────────────
-            // TOTAL PAYÉ
-            // ─────────────────────────────────────
+                    $montantAttendu = round($montantAttendu, 2);
 
-            $montantPaye = (float) TransactionPaiement::where(
-                'appartement_id',
-                $appartement->id
-            )
-                ->where('annee', $cotisation->annee_concernee)
-                ->sum('montant');
+                    // ─────────────────────────────
+                    // 2. CALCUL PAIEMENTS
+                    // ─────────────────────────────
 
-            // ─────────────────────────────────────
-            // CALCUL COUVERTURE
-            // ─────────────────────────────────────
+                    $montantPaye = (float) TransactionPaiement::where(
+                        'appartement_id',
+                        $appartement->id
+                    )
+                    ->where('annee', $annee)
+                    ->sum('montant');
 
-            $dateDebut = $cotisation->annee_concernee == $anneeDebut
-                ? $dateSignature->copy()
-                : Carbon::create($cotisation->annee_concernee, 1, 1);
+                    // ─────────────────────────────
+                    // 3. STATUT
+                    // ─────────────────────────────
 
-            $dateFinTheorique = Carbon::create(
-                $cotisation->annee_concernee,
-                12,
-                31
-            );
+                    if ($montantPaye >= $montantAttendu && $montantAttendu > 0) {
+                        $statut = 'payé';
+                    } elseif ($montantPaye <= 0) {
+                        $statut = 'en_retard';
+                    } else {
+                        $statut = 'partiel';
+                    }
 
-            $joursPeriode = $dateDebut->diffInDays($dateFinTheorique) + 1;
+                    // ─────────────────────────────
+                    // 4. USER (résident lié appartement)
+                    // ─────────────────────────────
 
-            $coutJournalier = $joursPeriode > 0
-                ? $montantAttendu / $joursPeriode
-                : 0;
+                    $userId = $appartement->proprietaire_id; 
+                    // ou relation future si tu changes
 
-            $joursCouverts = $coutJournalier > 0
-                ? floor($montantPaye / $coutJournalier)
-                : 0;
+                    // ─────────────────────────────
+                    // 5. SAVE
+                    // ─────────────────────────────
 
-            $dateEcheance = null;
+                    $cotisation->fill([
+                        'user_id'          => $userId,
+                        'montant_attendu'  => $montantAttendu,
+                        'montant_paye'     => $montantPaye,
+                        'statut'           => $statut,
+                        'commentaire'      => 'Synchronisation automatique',
+                    ]);
 
-            if ($joursCouverts > 0) {
-
-                $dateEcheance = $dateDebut->copy()
-                    ->addDays($joursCouverts - 1);
-
-                if ($dateEcheance->gt($dateFinTheorique)) {
-                    $dateEcheance = $dateFinTheorique->copy();
+                    $cotisation->save();
                 }
             }
 
-            // ─────────────────────────────────────
-            // CALCUL STATUT
-            // ─────────────────────────────────────
-
-            if (
-                $montantPaye >= $montantAttendu &&
-                $montantAttendu > 0
-            ) {
-
-                $statut = 'payé';
-
-            } elseif ($montantPaye <= 0) {
-
-                $statut = 'en_retard';
-
-            } elseif ($dateEcheance && now()->lte($dateEcheance)) {
-
-                $statut = 'partiel';
-
-            } else {
-
-                $statut = 'en_retard';
-            }
-
-            // ─────────────────────────────────────
-            // UPDATE
-            // ─────────────────────────────────────
-
-            $cotisation->update([
-                'montant_attendu' => $montantAttendu,
-                'montant_paye'    => $montantPaye,
-                'statut'          => $statut,
-            ]);
+            $this->info('Synchronisation cotisations terminée ✅');
         }
-
-        $this->info('Cotisations mises à jour avec succès ✅');
-    }
 }

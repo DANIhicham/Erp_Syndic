@@ -20,12 +20,12 @@ class UsersImport implements ToModel
         $prenomClean = $this->cleanString($prenom);
 
         // Génération email
-        $baseEmail = $prenomClean . '.' . $nomClean . '@bliving.ma';
+        $baseEmail = $prenomClean . '.' . $nomClean . '@livingfacility.ma';
         $email = $baseEmail;
 
         $i = 1;
         while (User::where('email', $email)->exists()) {
-            $email = $prenomClean . '.' . $nomClean . $i . '@bliving.ma';
+            $email = $prenomClean . '.' . $nomClean . $i . '@livingfacility.ma';
             $i++;
         }
 

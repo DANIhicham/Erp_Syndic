@@ -29,6 +29,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+
+
     public function appartements() { return $this->hasMany(Appartement::class, 'proprietaire_id'); }
 
         public function paiements()

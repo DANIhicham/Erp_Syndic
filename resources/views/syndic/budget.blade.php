@@ -126,8 +126,8 @@ function initBudgetCharts() {
     data: {
       labels: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
       datasets: [
-        { label:'Cotisations', data:[8200,7800,9100,7900,null,null,null,null,null,null,null,null], borderColor:'#22c55e', backgroundColor:g1, fill:true, tension:.45, borderWidth:2.5, pointBackgroundColor:'#22c55e', pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:4 },
-        { label:'Dépenses',    data:[4800,3200,12400,5100,null,null,null,null,null,null,null,null], borderColor:'#ef4444', backgroundColor:g2, fill:true, tension:.45, borderWidth:2.5, pointBackgroundColor:'#ef4444', pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:4 }
+        { label:'Cotisations', data: @json($cotisationsMensuelles), borderColor:'#22c55e', backgroundColor:g1, fill:true, tension:.45, borderWidth:2.5, pointBackgroundColor:'#22c55e', pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:4 },
+        { label:'Dépenses',    data: @json($depensesMensuelles), borderColor:'#ef4444', backgroundColor:g2, fill:true, tension:.45, borderWidth:2.5, pointBackgroundColor:'#ef4444', pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:4 }
       ]
     },
     options: {

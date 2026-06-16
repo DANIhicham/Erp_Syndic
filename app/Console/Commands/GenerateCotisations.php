@@ -32,7 +32,7 @@ class GenerateCotisations extends Command
         $anneeActuelle = now()->year;
 
         // Ignorer résidence ID = 1
-        $appartements = Appartement::where('residence_id', '!=', 1)->get();
+        $appartements = Appartement::whereNotIn('residence_id', [1, 2])->get();
 
         foreach ($appartements as $appartement) {
 

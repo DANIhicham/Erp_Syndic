@@ -297,7 +297,7 @@
             <div style="display:flex;gap:5px;align-items:center;flex-wrap:nowrap">
               @if($p->statut !== 'paye')
                 <button class="btn-primary-erp pay"
-                        onclick="openPayModal({{ $p->id }}, {{ $p->montant }}, '{{ addslashes($d->titre) }}', '{{ $p->periode_debut->format('d/m/Y') }}', '{{ $p->periode_fin->format('d/m/Y') }}', '{{ $d->type }}')"
+                        onclick="openPayModal({{ $p->id }}, {{ $p->montant }},{{ $p->montant_paye }}, '{{ addslashes($d->titre) }}', '{{ $p->periode_debut->format('d/m/Y') }}', '{{ $p->periode_fin->format('d/m/Y') }}', '{{ $d->type }}')"
                         title="Payer">
                   <i class="fa-solid fa-circle-check"></i>
                 </button>
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ── Payer une échéance ─────────────────────────────────────────────
-function openPayModal(paiementId, montant, titre, periodeDebut, periodeFin, type) {
+function openPayModal(paiementId, montant,montantPaye, titre, periodeDebut, periodeFin, type) {
     const form = document.getElementById('payForm');
     form.action = `/depenses/paiements/${paiementId}/payer`;
 

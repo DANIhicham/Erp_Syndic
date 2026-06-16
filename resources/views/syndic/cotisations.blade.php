@@ -11,9 +11,7 @@
     <h2>Cotisations</h2>
     <p>
       Suivi des paiements des copropriétaires
-      @if(session('residence_id'))
-        — {{ session('residence_nom', 'Résidence') }} ·
-      @endif
+
       {{ $annee }}
     </p>
   </div>
@@ -31,16 +29,17 @@
 {{-- ── KPI CARDS ────────────────────────────────────────────────── --}}
 <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
 
-  <div class="kpi-card kpi-green" style="animation-delay:.05s">
+
+    <div class="kpi-card kpi-green" style="animation-delay:.05s">
     <div class="kpi-top">
       <div>
-        <div class="kpi-label">Budget annuel</div>
+        <div class="kpi-label">Appartements payés</div>
         <div class="kpi-value">
-          {{ number_format($stats['total_budget'], 0, ',', ' ') }}
-          <small style="font-size:13px;font-weight:500;color:var(--text-4)">MAD</small>
+          {{ $stats['payes'] }}
+          <small style="font-size:13px;font-weight:500;color:var(--text-4)">Appt</small>
         </div>
-        <div class="kpi-sub">
-          montant annuel chaque appt × {{ $stats['total_apparts'] }} appartements
+        <div class="kpi-sub">Le montant annuel :<strong>
+          {{ number_format($montantAnnuelFixe, 2, ',', ' ') }} MAD</strong>
         </div>
       </div>
       <div class="kpi-icon green"><i class="fa-solid fa-building-columns"></i></div>

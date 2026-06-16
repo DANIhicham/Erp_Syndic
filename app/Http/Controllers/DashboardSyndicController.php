@@ -124,7 +124,7 @@ class DashboardSyndicController extends Controller
             ->where('statut', 'en_retard')
             ->whereYear('periode_debut', $annee)
             ->orderBy('periode_fin')
-            ->take(5)
+            // ->take(5)
             ->get();
 
         // ══════════════════════════════════════════════════════════════
@@ -217,47 +217,28 @@ class DashboardSyndicController extends Controller
         //  7. CHART.JS — DONNÉES MENSUELLES (Bar chart)
         // ══════════════════════════════════════════════════════════════
 
-        /**
-         * Cotisations encaissées par mois.
-         * Source : transactions_paiements GROUP BY MONTH(date_paiement)
-         */
-        $cotisationsMensuellesRaw = TransactionPaiement::whereHas('appartement', fn($q) =>
-                $q->where('residence_id', $residenceId))
-            ->where('annee', $annee)
-            ->whereNotNull('date_paiement')
-            ->selectRaw('MONTH(date_paiement) as mois, SUM(montant) as total')
-            ->groupBy('mois')
-            ->orderBy('mois')
-            ->pluck('total', 'mois'); // [1 => 8200, 3 => 5100, ...]
 
-        /**
-         * Dépenses payées par mois.
-         * Source : paiements_depenses GROUP BY MONTH(date_paiement)
-         */
-        $depensesMensuellesRaw = PaiementDepense::whereHas('depense', fn($q) =>
-                $q->where('residence_id', $residenceId))
-            ->where('statut', 'paye')
-            ->whereYear('date_paiement', $annee)
-            ->whereNotNull('date_paiement')
-            ->selectRaw('MONTH(date_paiement) as mois, SUM(montant) as total')
-            ->groupBy('mois')
-            ->orderBy('mois')
-            ->pluck('total', 'mois');
+        $cotisationsMensuelles = $this->calculerCotisationsMensuelles(
+            $residenceId,
+            $annee
+        );
 
-        // Construire les tableaux JS indexés 1→12 (null si aucune donnée future)
-        $moisCourant = now()->year == $annee ? now()->month : 12;
+        $depensesMensuelles = $this->calculerDepensesMensuelles(
+            $residenceId,
+            $annee
+        );
 
-        $cotisationsMensuelles = [];
-        $depensesMensuelles    = [];
+        // Masquer les mois futurs
+        $moisCourant = now()->year == $annee
+            ? now()->month
+            : 12;
 
         for ($m = 1; $m <= 12; $m++) {
-            // Pour les mois futurs on envoie null (spanGaps:false les masque sur le graphe)
+
             if ($m > $moisCourant) {
-                $cotisationsMensuelles[] = null;
-                $depensesMensuelles[]    = null;
-            } else {
-                $cotisationsMensuelles[] = (float) ($cotisationsMensuellesRaw[$m] ?? 0);
-                $depensesMensuelles[]    = (float) ($depensesMensuellesRaw[$m] ?? 0);
+
+                $cotisationsMensuelles[$m - 1] = null;
+                $depensesMensuelles[$m - 1] = null;
             }
         }
 
@@ -338,6 +319,8 @@ class DashboardSyndicController extends Controller
             'alertes',
 
             // Chart.js — données mensuelles
+            // 'cotisationsMensuelles',
+            // 'depensesMensuelles',
             'cotisationsMensuelles',
             'depensesMensuelles',
 
@@ -458,4 +441,172 @@ class DashboardSyndicController extends Controller
             ->values()
             ->toArray();
     }
+
+    private function calculerCotisationsMensuelles($residenceId, $annee)
+    {
+        $mois = array_fill(1, 12, 0);
+
+        $cotisations = PaiementCotisation::with('appartement')
+            ->where('annee_concernee', $annee)
+            ->whereHas('appartement', function ($q) use ($residenceId) {
+                $q->where('residence_id', $residenceId);
+            })
+            ->get();
+
+        foreach ($cotisations as $cotisation) {
+
+            $appartement = $cotisation->appartement;
+
+            $moisDebut = 1;
+
+            if ($appartement->date_signature_contrat) {
+
+                $dateSignature = Carbon::parse(
+                    $appartement->date_signature_contrat
+                );
+
+                if ($dateSignature->year == $annee) {
+                    $moisDebut = $dateSignature->month;
+                }
+            }
+
+            $nbMois = 13 - $moisDebut;
+
+            if ($nbMois <= 0) {
+                continue;
+            }
+
+            $mensuel = $cotisation->montant_attendu / $nbMois;
+
+            $reste = $cotisation->montant_paye;
+
+            for ($m = $moisDebut; $m <= 12; $m++) {
+
+                if ($reste <= 0) {
+                    break;
+                }
+
+                $valeur = min($mensuel, $reste);
+
+                $mois[$m] += round($valeur, 2);
+
+                $reste -= $valeur;
+            }
+        }
+
+        return array_values($mois);
+    }
+
+    private function calculerDepensesMensuelles($residenceId, $annee)
+    {
+        $mois = array_fill(1, 12, 0);
+
+        $paiements = PaiementDepense::with('depense')
+            ->whereHas('depense', function ($q) use ($residenceId) {
+                $q->where('residence_id', $residenceId);
+            })
+            ->where('statut', 'paye')
+            ->whereYear('periode_debut', $annee)
+            ->get();
+
+        foreach ($paiements as $paiement) {
+
+            $depense = $paiement->depense;
+
+            // =========================
+            // MENSUEL
+            // =========================
+            if ($depense->type === 'mensuel') {
+
+                $dateDebut = \Carbon\Carbon::parse(
+                    $paiement->periode_debut
+                );
+
+                $dateFin = Carbon::parse(
+                    $paiement->periode_fin
+                );
+
+                $nbMois = $dateDebut->diffInMonths($dateFin) + 1;
+
+                if ($nbMois <= 0) {
+                    continue;
+                }
+
+                $mensuel = $paiement->montant / $nbMois;
+
+                for ($m = $dateDebut->month; $m <= $dateFin->month; $m++) {
+
+                    $mois[$m] += round($mensuel, 2);
+                }
+            }
+
+            // =========================
+            // TRIMESTRIEL
+            // =========================
+            elseif ($depense->type === 'trimestriel') {
+
+                $dateDebut = Carbon::parse(
+                    $paiement->periode_debut
+                );
+
+                $dateFin = Carbon::parse(
+                    $paiement->periode_fin
+                );
+
+                $nbTrimestres = ceil(
+                    ($dateDebut->diffInMonths($dateFin) + 1) / 3
+                );
+
+                if ($nbTrimestres <= 0) {
+                    continue;
+                }
+
+                $montantTrim = $paiement->montant / $nbTrimestres;
+
+                for ($m = $dateDebut->month; $m <= $dateFin->month; $m += 3) {
+
+                    $mois[$m] += round($montantTrim, 2);
+                }
+            }
+
+            // =========================
+            // UNIQUE
+            // =========================
+            elseif ($depense->type === 'unique') {
+
+                if (!$paiement->date_paiement) {
+                    continue;
+                }
+
+                $moisPaiement = Carbon::parse(
+                    $paiement->periode_fin
+                )->month;
+
+                $montant = $paiement->montant_paye > 0
+                    ? $paiement->montant_paye
+                    : $paiement->montant;
+
+                $mois[$moisPaiement] += $montant;
+            }
+
+            // =========================
+            // VARIABLE
+            // =========================
+            elseif ($depense->type === 'variable') {
+
+                if (!$paiement->date_paiement) {
+                    continue;
+                }
+
+                $moisPaiement = Carbon::parse(
+                    $paiement->periode_fin
+                )->month;
+
+                $mois[$moisPaiement] += $paiement->montant;
+            }
+        }
+
+        return array_values($mois);
+    }
+
 }

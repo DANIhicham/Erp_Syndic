@@ -7,7 +7,7 @@
 
 
 <div class="page-header">
-        <div class="ph-left"><h2>Réclamations Syndic</h2><p>Problèmes signalés dans Bliving Office</p></div>
+        <div class="ph-left"><h2>Réclamations Syndic</h2><p>Problèmes signalés </p></div>
         <div class="ph-right">
           <button class="btn-primary-erp" onclick="openModal('modalReclamation')"><i class="fa-solid fa-plus"></i> Nouvelle réclamation</button>
         </div>

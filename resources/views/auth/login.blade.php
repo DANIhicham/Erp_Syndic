@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - BLIVING OFFICE</title>
+    <title>Connexion - LIVING FACILITY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <!-- Login CSS -->
@@ -22,8 +22,8 @@
             <div class="logo-icon">
                 <i class="fa-solid fa-building-columns"></i>
             </div>
-            <h1 class="brand-title">BLIVING</h1>
-            <p class="brand-subtitle">ERP Gestion</p>
+            <h1 class="brand-title">LIVING FACILITY</h1>
+            <p class="brand-subtitle">Systéme Gestion</p>
         </div>
 
         <form action="{{ route('login') }}" method="POST">
@@ -39,7 +39,7 @@
                         id="email" 
                         name="email" 
                         class="form-input" 
-                        placeholder="admin@bliving.ma"
+                        placeholder="Entrer l email"
                         value="{{ old('email') }}"
                         required 
                         autofocus

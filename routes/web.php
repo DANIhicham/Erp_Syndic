@@ -3,11 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ResidentDashboardController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\AppartementController;
+use App\Http\Controllers\ResidentController;
+use App\Http\Controllers\UtilisateurController;
+
 use App\Http\Controllers\CotisationController;
 use App\Http\Controllers\CoproprietaireController;
 use App\Http\Controllers\DashboardSyndicController;
 use App\Http\Controllers\ReclamationController;
 use App\Http\Controllers\DepenseResidenceController;
+use App\Http\Controllers\ResidenceController ;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -32,7 +37,7 @@ Route::post('/test-submit', function () {
 
 
 
-Route::middleware(['auth', 'role:syndic'])->group(function () {
+Route::middleware(['auth', 'role:syndic,admin'])->group(function () {
     
     Route::post('/set-residence', function (Request $request) {
     session(['residence_id' => $request->residence_id]);
@@ -141,20 +146,57 @@ Route::middleware(['auth', 'role:proprietaire'])->group(function () {
 
 //-----------------------IMPORT APPARTEMENTS----------------------------------------
 
-use App\Imports\AppartementsImport;
-use Maatwebsite\Excel\Facades\Excel;
+// use App\Imports\AppartementsImport;
+// use Maatwebsite\Excel\Facades\Excel;
 
-Route::get('/import-appartements', function () {
-    Excel::import(new AppartementsImport, public_path('appartements.xlsx'));
+// Route::get('/import-appartements', function () {
+//     Excel::import(new AppartementsImport, public_path('appartements.xlsx'));
 
-    return "Import appartements terminé";
+//     return "Import appartements terminé";
+// });
+
+
+
+Route::middleware(['auth', 'role:admin,syndic'])->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('residences', ResidenceController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::resource('appartements', AppartementController::class);
+        Route::post(
+            'appartements/{appartement}/associer',
+            [AppartementController::class, 'associer']
+        )->name('appartements.associer');
+
+        Route::post(
+            'appartements/{appartement}/dissocier',
+            [AppartementController::class, 'dissocier']
+        )->name('appartements.dissocier');
+
+
+        Route::resource('residents', ResidentController::class)
+            ->only(['index', 'store', 'update']);
+
+        Route::patch('residents/{user}/toggle-etat',
+            [ResidentController::class, 'toggleEtat']);
+
+        Route::post('residents/{user}/assign-appartement',
+            [ResidentController::class, 'assignAppartement']);
+
+        Route::delete('residents/{user}',
+            [ResidentController::class, 'destroy']);
+
+
+        Route::resource('utilisateurs', UtilisateurController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::patch(
+            'utilisateurs/{utilisateur}/toggle-etat',
+            [UtilisateurController::class, 'toggleEtat']
+        )->name('utilisateurs.toggle-etat');
+
+    });
 });
-
-
-
-
-
-
 
 
 Route::get('/contrats', function () {

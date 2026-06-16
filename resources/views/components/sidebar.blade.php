@@ -8,8 +8,8 @@
             $residenceActive = $residences->firstWhere('id', session('residence_id'));
         @endphp
         <div class="brand-text">
-            <span class="brand-name">{{ $residenceActive->nom }}</span>
-            <span class="brand-tag">ERP Gestion</span>
+            <span class="brand-name">LIVING FACILITY</span>
+            <span class="brand-tag">Systéme Gestion</span>
         </div>
         <button class="sidebar-toggle d-lg-none" id="sidebarClose">
             <i class="fa-solid fa-xmark"></i>
@@ -76,74 +76,55 @@
                 </li>
             </ul>
         </div>
-        <!--
+
+       @if(auth()->user()->role === 'admin') 
         <div class="nav-section">
-            <span class="nav-label">Finances</span>
+            <span class="nav-label">Administration Syndic</span>
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="{{ url('/paiements_loyers') }}" class="nav-link {{ Request::is('paiements_loyers*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.residences.index') }}" class="nav-link {{ Request::is('admin/residences*') ? 'active' : '' }}">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <i class="fa-solid fa-house-chimney"></i>
+                            <!-- <i class="fa-solid fa-building-user"></i> -->
                         </span>
-                        <span class="nav-text">Paiements loyers</span>
-                        <span class="nav-badge danger">3</span>
+                        <span class="nav-text">Résidences</span>
+                        
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.appartements.index') }}" class="nav-link {{ Request::is('admin/appartements*') ? 'active' : '' }}">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-receipt"></i>
+                            <i class="fa-solid fa-building"></i>
                         </span>
-                        <span class="nav-text">Charges</span>
+                        <span class="nav-text">Appartements</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.residents.index') }}" class="nav-link {{ Request::is('admin/residents*') ? 'active' : '' }}">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-chart-pie"></i>
+                            <i class="fa-solid fa-people-group"></i>
                         </span>
-                        <span class="nav-text">Rapports</span>
+                        <span class="nav-text">Résidents</span>
                     </a>
                 </li>
             </ul>
         </div>
-
+        
         <div class="nav-section">
-            <span class="nav-label">Gestion</span>
+            <span class="nav-label">Gestion des Agents</span>
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.utilisateurs.index') }}" class="nav-link {{ Request::is('admin/utilisateurs*') ? 'active' : '' }}">
                         <span class="nav-icon">
-                            <i class="fa-solid fa-users"></i>
+                            <i class="fa-solid fa-users-gear"></i>
                         </span>
-                        <span class="nav-text">Locataires</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon">
-                            <i class="fa-solid fa-key"></i>
-                        </span>
-                        <span class="nav-text">Propriétaires</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon">
-                            <i class="fa-solid fa-clipboard-list"></i>                        </span>
-                        <span class="nav-text">Réclamations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon">
-                            <i class="fa-solid fa-gear"></i>
-                        </span>
-                        <span class="nav-text">Paramètres</span>
+                        <span class="nav-text">Nos Agents</span>
                     </a>
                 </li>
             </ul>
-        </div>-->
+        </div>
+         @endif 
+
     </nav>
 
     <!-- Sidebar Footer -->

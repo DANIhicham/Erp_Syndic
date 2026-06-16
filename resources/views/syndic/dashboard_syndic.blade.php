@@ -30,8 +30,8 @@
   <div class="page-header">
     <div class="ph-left">
       <h2>Dashboard Syndic</h2>
-      {{-- Nom de la résidence dynamique + exercice --}}
-      <p>Vue d'ensemble de {{ $residence?->nom ?? 'la résidence' }} — Exercice {{ $annee }}</p>
+      {{-- Nom de la résidence dynamique  --}}
+      <p>Vue d'ensemble de {{ $residence?->nom ?? 'la résidence' }} — {{ $annee }}</p>
     </div>
     <div class="ph-right">
       {{-- Filtre année dynamique --}}
@@ -40,9 +40,9 @@
           <option value="{{ $a }}" @selected($a == $annee)>{{ $a }}</option>
         @endforeach
       </select>
-      <button class="btn-outline-erp">
+      <!-- <button class="btn-outline-erp">
         <i class="fa-solid fa-print"></i> Rapport
-      </button>
+      </button> -->
     </div>
   </div>
 
@@ -66,7 +66,7 @@
       </div>
       {{-- Barre = % encaissé vs attendu --}}
       <div class="kpi-progress">
-        <div class="kpi-progress-bar" style="width:{{ $tauxCollecte }}%"></div>
+        <div class="kpi-progress-bar" style="width:100%"></div>
       </div>
     </div>
 
@@ -158,7 +158,7 @@
                 {{ $nbImpayes }} copropriétaire{{ $nbImpayes > 1 ? 's' : '' }}
               </span>
             @else
-              <span>Aucun impayé 🎉</span>
+              <span>Aucun impayé </span>
             @endif
           </div>
         </div>
@@ -204,7 +204,7 @@
         <div class="kpi-icon orange"><i class="fa-solid fa-wrench"></i></div>
       </div>
       <div class="kpi-progress">
-        <div class="kpi-progress-bar" style="width:{{ $reclamPct }}%"></div>
+        <div class="kpi-progress-bar" style="width:100%"></div>
       </div>
     </div>
 

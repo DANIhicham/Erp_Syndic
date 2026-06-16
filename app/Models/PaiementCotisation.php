@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PaiementCotisation extends Model
 {
-    protected $fillable = ['appartement_id', 'user_id', 'annee_concernee', 'montant_paye', 'date_paiement', 'mode_paiement', 'reference_paiement', 'statut', 'commentaire'];
+    protected $fillable = ['appartement_id', 'user_id', 'annee_concernee', 'montant_paye','montant_attendu', 'date_paiement', 'mode_paiement', 'reference_paiement', 'statut', 'commentaire'];
 
     public function appartement() 
     { 
