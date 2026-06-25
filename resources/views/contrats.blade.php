@@ -105,7 +105,6 @@
         <option value="">Tous les types</option>
         <option value="résidentiel">Bail résidentiel</option>
         <option value="commercial">Bail commercial</option>
-        <option value="mandat">Mandat de gestion</option>
       </select>
 
       <div class="filter-divider d-none d-md-block"></div>
@@ -142,7 +141,7 @@
             <tr data-statut="actif" data-type="résidentiel" data-residence="atlas" onclick="openContratDetail(0)">
               <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check"></td>
               <td><div class="ref-cell"><span class="ref-code">CTR-2026-001</span></div></td>
-              <td><div class="unit-cell"><span class="unit-name">Apt. 05 — Étage 2</span><span class="unit-res">Résidence Atlas</span></div></td>
+              <td><div class="unit-cell"><span class="unit-name">Apt. 05 — Étage 2</span></div></td>
               <td>
                 <div class="tenant-cell">
                   <div class="t-avatar" style="background:#4f46e5">KB</div>
@@ -162,7 +161,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(0)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                   <button class="ra-btn delete" title="Résilier"><i class="fa-solid fa-ban"></i></button>
                 </div>
               </td>
@@ -171,7 +169,7 @@
             <tr data-statut="expiring" data-type="résidentiel" data-residence="atlas" onclick="openContratDetail(1)">
               <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check"></td>
               <td><div class="ref-cell"><span class="ref-code">CTR-2026-002</span></div></td>
-              <td><div class="unit-cell"><span class="unit-name">Apt. 12B — Étage 4</span><span class="unit-res">Résidence Atlas</span></div></td>
+              <td><div class="unit-cell"><span class="unit-name">Apt. 12B — Étage 4</span></div></td>
               <td>
                 <div class="tenant-cell">
                   <div class="t-avatar" style="background:#0891b2">SO</div>
@@ -191,7 +189,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(1)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                   <button class="ra-btn delete" title="Résilier"><i class="fa-solid fa-ban"></i></button>
                 </div>
               </td>
@@ -220,7 +217,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(2)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                   <button class="ra-btn delete" title="Résilier"><i class="fa-solid fa-ban"></i></button>
                 </div>
               </td>
@@ -249,7 +245,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(3)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                   <button class="ra-btn delete" title="Résilier"><i class="fa-solid fa-ban"></i></button>
                 </div>
               </td>
@@ -258,7 +253,7 @@
             <tr data-statut="actif" data-type="résidentiel" data-residence="atlas" onclick="openContratDetail(4)">
               <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check"></td>
               <td><div class="ref-cell"><span class="ref-code">CTR-2026-007</span></div></td>
-              <td><div class="unit-cell"><span class="unit-name">Apt. 07 — Étage 3</span><span class="unit-res">Résidence Atlas</span></div></td>
+              <td><div class="unit-cell"><span class="unit-name">Apt. 07 — Étage 3</span></div></td>
               <td>
                 <div class="tenant-cell">
                   <div class="t-avatar" style="background:#7c3aed">RA</div>
@@ -278,7 +273,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(4)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                   <button class="ra-btn delete" title="Résilier"><i class="fa-solid fa-ban"></i></button>
                 </div>
               </td>
@@ -314,7 +308,7 @@
             <tr data-statut="actif" data-type="mandat" data-residence="atlas" onclick="openContratDetail(6)">
               <td onclick="event.stopPropagation()"><input type="checkbox" class="row-check"></td>
               <td><div class="ref-cell"><span class="ref-code">MND-2025-003</span></div></td>
-              <td><div class="unit-cell"><span class="unit-name">Apt. 09 — Étage 3</span><span class="unit-res">Résidence Atlas</span></div></td>
+              <td><div class="unit-cell"><span class="unit-name">Apt. 09 — Étage 3</span></div></td>
               <td>
                 <div class="tenant-cell">
                   <div class="t-avatar" style="background:#0f766e">HZ</div>
@@ -334,7 +328,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(6)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                   <button class="ra-btn delete" title="Résilier"><i class="fa-solid fa-ban"></i></button>
                 </div>
               </td>
@@ -363,7 +356,6 @@
                 <div class="row-actions">
                   <button class="ra-btn view" title="Voir détail" onclick="openContratDetail(7)"><i class="fa-solid fa-eye"></i></button>
                   <button class="ra-btn download" title="Télécharger PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                  <button class="ra-btn renew" title="Renouveler"><i class="fa-solid fa-rotate"></i></button>
                 </div>
               </td>
             </tr>
@@ -408,11 +400,10 @@
           <span class="s-badge actif" id="dBadge">Actif</span>
         </div>
         <h3 class="mh-title" id="dTitle">Contrat — Karim Benali</h3>
-        <p class="mh-sub" id="dSub">Apt. 05 — Étage 2 · Résidence Atlas · Bail résidentiel</p>
+        <p class="mh-sub" id="dSub">Apt. 05 — Étage 2 · Bail résidentiel</p>
       </div>
       <div class="mh-right">
         <button class="btn-outline-erp" id="dDownloadBtn"><i class="fa-solid fa-download"></i> PDF</button>
-        <button class="btn-primary-erp" id="dRenewBtn"><i class="fa-solid fa-rotate"></i> Renouveler</button>
         <button class="modal-close" onclick="closeModal('detailModal')"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
@@ -593,10 +584,10 @@
             <label class="form-label">Appartement *</label>
             <select class="form-control-erp">
               <option value="">— Sélectionner —</option>
-              <option>Apt. 05 — Résidence Atlas</option>
-              <option>Apt. 08 — Résidence Atlas</option>
-              <option>Apt. 14A — Résidence Palmeraie</option>
-              <option>Apt. 11 — Résidence Majorelle</option>
+              <option>Apt. 05</option>
+              <option>Apt. 08</option>
+              <option>Apt. 14</option>
+              <option>Apt. 11</option>
             </select>
           </div>
           <div class="form-group">
@@ -620,11 +611,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Propriétaire</label>
-            <select class="form-control-erp">
-              <option>Omar Alaoui</option>
-              <option>Fatima Tahiri</option>
-              <option>Syndic (en propre)</option>
-            </select>
+              <option class="form-control-erp">Omar Alaoui</option>
           </div>
         </div>
 

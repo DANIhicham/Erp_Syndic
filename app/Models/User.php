@@ -42,6 +42,35 @@ class User extends Authenticatable
     {
         return $this->hasMany(TransactionPaiement::class);
     }
+
+    /**
+     * Contrats où ce user est le propriétaire.
+     */
+    public function contratsProprietaire()
+    {
+        return $this->hasMany(Contrat::class, 'proprietaire_id');
+    }
+
+    /**
+     * Contrats où ce user est le locataire.
+     */
+
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
+
+
+    public function contratsLocataire()
+    {
+        return $this->hasMany(Contrat::class, 'locataire_id');
+    }
+
+    public function reclamations()
+    {
+        return $this->hasMany(Reclamation::class);
+    }
     /**
      * Get the attributes that should be cast.
      *
@@ -68,6 +97,11 @@ class User extends Authenticatable
     public function isProprietaire()
     {
         return $this->role === 'proprietaire';
+    }
+
+    public function isLocataire()
+    {
+        return $this->role === 'locataire';
     }
     
 

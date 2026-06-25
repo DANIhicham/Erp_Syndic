@@ -13,6 +13,11 @@ use App\Http\Controllers\DashboardSyndicController;
 use App\Http\Controllers\ReclamationController;
 use App\Http\Controllers\DepenseResidenceController;
 use App\Http\Controllers\ResidenceController ;
+use App\Http\Controllers\LocataireController;
+use App\Http\Controllers\PaiementLoyerController;
+use App\Http\Controllers\DashboardloCationcontroller ;
+
+use App\Http\Controllers\ContratController;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -34,15 +39,15 @@ Route::post('/test-submit', function () {
 // PARTIE SYNDIC ERP
 // -------------------------------------------
 
-
-
-
-Route::middleware(['auth', 'role:syndic,admin'])->group(function () {
-    
+Route::middleware(['auth', 'role:syndic,admin,locateur'])->group(function () {
     Route::post('/set-residence', function (Request $request) {
     session(['residence_id' => $request->residence_id]);
     return back();
     })->name('set.residence');
+});
+
+Route::middleware(['auth', 'role:syndic,admin'])->group(function () {
+    
 
     //--Dashboard-------------------------------------------------
     Route::get('/dashboard_syndic', [DashboardSyndicController::class, 'index'])
@@ -199,9 +204,70 @@ Route::middleware(['auth', 'role:admin,syndic'])->group(function () {
 });
 
 
-Route::get('/contrats', function () {
-    return view('contrats');
-})->name('contrats');
+Route::middleware(['auth', 'role:locateur,admin'])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Contrats
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('contrats', ContratController::class)
+        ->only(['index', 'store', 'show', 'update']);
+
+    Route::post(
+        'contrats/{contrat}/resilier',
+        [ContratController::class, 'resilier']
+    )->name('contrats.resilier');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locataires
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('locataires', LocataireController::class)
+        ->only(['index', 'store', 'show', 'update']);
+
+    Route::post(
+        'locataires/{locataire}/toggle-etat',
+        [LocataireController::class, 'toggleEtat']
+    )->name('locataires.toggleEtat');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paiements de loyer
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('paiements-loyer')
+        ->name('paiements-loyer.')
+        ->group(function () {
+
+            Route::get('/', [PaiementLoyerController::class, 'index'])
+                ->name('index');
+
+            Route::get('/{paiementLoyer}', [PaiementLoyerController::class, 'show'])
+                ->name('show');
+
+            Route::post('/{paiementLoyer}/encaisser', [PaiementLoyerController::class, 'encaisser'])
+                ->name('encaisser');
+        });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Location
+    |--------------------------------------------------------------------------
+    */
+    Route::get(
+        'dashboard-location',
+        [DashboardLocationController::class, 'index']
+    )->name('dashboard-location.index');
+
+});
+// Route::get('/contrats', function () {
+//     return view('contrats');
+// })->name('contrats');
 
 Route::get('/paiements_loyers', function () {
     return view('paiements_loyers');

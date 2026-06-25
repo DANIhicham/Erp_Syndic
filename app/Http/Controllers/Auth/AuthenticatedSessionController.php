@@ -38,6 +38,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended('/dashboard_syndic');
         }
 
+        if ($user->role === 'locateur') {
+            return redirect()->intended('/dashboard-location');
+        }
+
         return redirect()->intended('/resident_dashboard');
     }
 

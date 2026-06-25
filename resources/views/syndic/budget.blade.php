@@ -11,7 +11,7 @@
         </div>
         <div class="ph-right">
           <select onchange="window.location.href='?annee='+this.value" class="filter-select"><option>Année</option><option>2026</option><option>2025</option><option>2024</option></select>
-          <button class="btn-outline-erp"><i class="fa-solid fa-print"></i> Imprimer bilan</button>
+
           <button class="btn-primary-erp" onclick="openModal('modalBudget')"><i class="fa-solid fa-gear"></i> Configurer budget</button>
         </div>
       </div>
@@ -107,9 +107,7 @@
     </div> </form>
   </div>
 </div>
-<div class="alert alert-info">
-    ID de la résidence actuelle : {{ session('residence_id', 'Session vide') }}
-</div>
+
 @push('scripts')
 
 <script>

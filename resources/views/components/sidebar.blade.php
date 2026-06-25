@@ -19,6 +19,7 @@
     <!-- Navigation -->
     <nav class="sidebar-nav">
         <div class="nav-section">
+            @if(in_array(auth()->user()->role, ['admin', 'syndic']))
             <span class="nav-label">Module Syndic</span>
             <ul class="nav-list">
                 <li class="nav-item">
@@ -76,6 +77,47 @@
                 </li>
             </ul>
         </div>
+        @endif
+
+        @if(in_array(auth()->user()->role, ['admin', 'locateur']))
+        <div class="nav-section">
+            <span class="nav-label">Module location</span>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="{{ route('dashboard-location.index') }}" class="nav-link {{ Request::is('dashboard-location*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-gauge"></i>
+                        </span>
+                        <span class="nav-text">Dashboard Location</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('contrats.index') }}" class="nav-link {{ Request::is('contrats*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-handshake"></i>
+                        </span>
+                        <span class="nav-text">Contrats</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('locataires.index') }}" class="nav-link {{ Request::is('locataires*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <span class="nav-text">Locataires</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('paiements-loyer.index') }}" class="nav-link {{ Request::is('paiements-loyer*') ? 'active' : '' }}">
+                        <span class="nav-icon">
+                            <i class="fa-solid fa-money-bill-1-wave"></i>
+                        </span>
+                        <span class="nav-text">Paiement Loyer</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        @endif
 
        @if(auth()->user()->role === 'admin') 
         <div class="nav-section">
@@ -109,7 +151,7 @@
                 </li>
             </ul>
         </div>
-        
+
         <div class="nav-section">
             <span class="nav-label">Gestion des Agents</span>
             <ul class="nav-list">
@@ -121,6 +163,7 @@
                         <span class="nav-text">Nos Agents</span>
                     </a>
                 </li>
+                
             </ul>
         </div>
          @endif 
