@@ -252,14 +252,13 @@
                 <button
                   class="ra-btn edit"
                   title="Modifier"
-                  onclick="openModifier(
-                    {{ $res->id }},
-                    '{{ addslashes($res->nom) }}',
-                    '{{ addslashes($res->prenom) }}',
-                    '{{ $res->email }}',
-                    '{{ $res->telephone ?? '' }}',
-                    '{{ $res->cin ?? '' }}'
-                  )"
+                  data-id="{{ $res->id }}"
+                  data-nom="{{ addslashes($res->nom) }}"
+                  data-prenom="{{ addslashes($res->prenom) }}"
+                  data-email="{{ $res->email }}"
+                  data-tel="{{ $res->telephone ?? '' }}"
+                  data-cin="{{ $res->cin ?? '' }}"
+                  onclick="openModifierFromBtn(this)"
                 >
                   <i class="fa-solid fa-pen-to-square"></i>
                 </button>
@@ -277,6 +276,30 @@
                     <i class="fa-solid fa-building-user"></i>
                   </button>
                 @endif
+
+                 
+                @if($res->role === 'proprietaire' && $apts->isNotEmpty())
+                  @php
+                    $aptsJson = $apts->map(fn($a) => [
+                      'id'     => $a->id,
+                      'numero' => $a->numero,
+                      'res'    => $a->residence->nom ?? '',
+                    ])->values()->toJson();
+                  @endphp
+                  <button
+                    class="ra-btn"
+                    style="color:var(--brand)"
+                    title="Transférer la propriété"
+                    onclick="openTransfert(
+                      {{ $res->id }},
+                      '{{ addslashes($res->prenom) }} {{ addslashes($res->nom) }}',
+                      {{ $aptsJson }}
+                    )"
+                  >
+                    <i class="fa-solid fa-right-left"></i>
+                  </button>
+                @endif
+ 
 
                 {{-- Désactiver / Réactiver --}}
                 @if($res->etat === 'active')
@@ -472,7 +495,7 @@
 
       <div class="form-group">
         <label class="form-label">Email <span style="color:var(--red-t)">*</span></label>
-        <input type="email" id="modEmail" class="form-control">
+        <input type="text" id="modEmail" class="form-control" autocomplete="off">
         <div id="errModEmail" class="form-err"></div>
       </div>
 
@@ -711,6 +734,133 @@
   </div>
 </div>
 
+
+
+{{-- ════════════════════════════════════════════════════════════════
+     MODAL — TRANSFERT DE PROPRIÉTÉ
+════════════════════════════════════════════════════════════════ --}}
+<div class="modal-overlay" id="modalTransfert">
+  <div class="modal-panel" style="max-width:520px">
+
+    <div class="modal-head">
+      <div>
+        <h3 class="mh-title">
+          <i class="fa-solid fa-right-left" style="margin-right:7px;color:var(--brand)"></i>
+          Transfert de propriété
+        </h3>
+        <p class="mh-sub" id="transfertSubtitle">—</p>
+      </div>
+      <div class="mh-right">
+        <button class="modal-close" onclick="closeModal('modalTransfert')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="transfertAptId">
+      <input type="hidden" id="transfertAncienId">
+
+      {{-- Alerte --}}
+      <div style="display:flex;gap:10px;align-items:flex-start;background:#fffbeb;border:1.5px solid rgba(234,179,8,.25);border-radius:var(--r-md);padding:12px 14px;margin-bottom:18px">
+        <i class="fa-solid fa-triangle-exclamation" style="color:var(--orange-t);font-size:15px;flex-shrink:0;margin-top:1px"></i>
+        <div style="font-size:12.5px;color:var(--text-2);line-height:1.65">
+          <strong>Action irréversible.</strong> Les cotisations seront recalculées au prorata.
+          L'historique de l'ancien propriétaire est conservé intégralement.
+        </div>
+      </div>
+
+      <div class="form-section-label">
+        <i class="fa-solid fa-building" style="color:var(--brand)"></i>
+        Bien concerné
+      </div>
+
+      {{-- Si plusieurs appartements : select, sinon info --}}
+      <div class="form-group" id="transfertAptSelectGroup">
+        <label class="form-label">
+          Appartement à transférer <span style="color:var(--red-t)">*</span>
+        </label>
+        <select id="transfertAptSelect" class="form-control" onchange="onAptSelectChange()">
+          <option value="">— Sélectionner l'appartement à vendre —</option>
+        </select>
+        <div id="errTransfertApt" class="form-err"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ancien propriétaire</label>
+        <input type="text" id="transfertAncienLabel" class="form-control" readonly
+          style="background:var(--surface-2);color:var(--text-3);cursor:not-allowed">
+      </div>
+
+      <div class="form-section-label" style="margin-top:6px">
+        <i class="fa-solid fa-user-plus" style="color:var(--brand)"></i>
+        Nouveau propriétaire
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Sélectionner le nouveau propriétaire <span style="color:var(--red-t)">*</span></label>
+        <select id="transfertNouveauId" class="form-control">
+          <option value="">— Sélectionner —</option>
+          @foreach($tousProprietaires as $prop)
+            <option value="{{ $prop->id }}">
+              {{ $prop->nom }} {{ $prop->prenom }}
+              @if($prop->telephone) — {{ $prop->telephone }} @endif
+            </option>
+          @endforeach
+        </select>
+        <div id="errTransfertNouveau" class="form-err"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Date de vente <span style="color:var(--red-t)">*</span></label>
+        <input type="date" id="transfertDateVente" class="form-control" max="{{ now()->format('Y-m-d') }}">
+        <div id="errTransfertDate" class="form-err"></div>
+        <div style="font-size:12px;color:var(--text-4);margin-top:5px">
+          <i class="fa-solid fa-circle-info" style="margin-right:3px"></i>
+          Les cotisations de l'année de vente seront recalculées au prorata à partir de cette date.
+        </div>
+      </div>
+
+      {{-- Aperçu prorata (calculé dynamiquement) --}}
+      <div id="prorataPreview" style="display:none;background:var(--surface-1);border:1.5px solid var(--border-2);border-radius:var(--r-md);padding:14px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">
+          <i class="fa-solid fa-calculator" style="margin-right:5px;color:var(--brand)"></i>
+          Aperçu du prorata
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:var(--surface-2);border-radius:var(--r-sm);padding:10px">
+            <div style="font-size:11.5px;color:var(--text-4);margin-bottom:4px">Ancien propriétaire</div>
+            <div id="prorataAncien" style="font-size:13.5px;font-weight:700;color:var(--text-1)">—</div>
+            <div id="prorataAncienPeriode" style="font-size:11px;color:var(--text-4);margin-top:2px">—</div>
+          </div>
+          <div style="background:var(--surface-2);border-radius:var(--r-sm);padding:10px">
+            <div style="font-size:11.5px;color:var(--text-4);margin-bottom:4px">Nouveau propriétaire</div>
+            <div id="prorataNouveau" style="font-size:13.5px;font-weight:700;color:var(--brand)">—</div>
+            <div id="prorataNouveauPeriode" style="font-size:11px;color:var(--text-4);margin-top:2px">—</div>
+          </div>
+        </div>
+      </div>
+
+    </div>{{-- /modal-body --}}
+
+    <div class="modal-foot">
+      <div class="mf-left"></div>
+      <div class="mf-right">
+        <button class="btn-outline-erp" onclick="closeModal('modalTransfert')">Annuler</button>
+        <button
+          id="btnTransfert"
+          onclick="submitTransfert()"
+          style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r-md);background:var(--brand);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:var(--font-b);transition:opacity .2s"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'"
+        >
+          <i class="fa-solid fa-right-left"></i> Confirmer le transfert
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 @endsection
 
 
@@ -885,6 +1035,18 @@ async function submitAjouter() {
 /* ════════════════════════════════════════════════════════
    OUVRIR MODIFIER
 ════════════════════════════════════════════════════════ */
+// Lire les data-attributes du bouton pour éviter les problèmes d'encodage
+// (caractères spéciaux dans l'email comme +, accents, etc.)
+function openModifierFromBtn(btn) {
+  const id     = btn.dataset.id;
+  const nom    = btn.dataset.nom;
+  const prenom = btn.dataset.prenom;
+  const email  = btn.dataset.email;   // lu depuis data-attribute : pas de troncature JS
+  const tel    = btn.dataset.tel;
+  const cin    = btn.dataset.cin;
+  openModifier(id, nom, prenom, email, tel, cin);
+}
+
 function openModifier(id, nom, prenom, email, tel, cin) {
   document.getElementById('modId').value       = id;
   document.getElementById('modNom').value      = nom;
@@ -1088,8 +1250,198 @@ _s.textContent = `
   @keyframes _toastIn { from { opacity:0;transform:translateX(30px) } to { opacity:1;transform:none } }
   .form-err { display:none;font-size:12px;color:var(--red-t);margin-top:4px }
   .s-badge.inactive { background:var(--surface-2);color:var(--text-3);border-color:var(--border-2) }
+  .tab-loading { text-align:center;padding:32px;font-size:22px;color:var(--text-4); }
+  .tab-empty   { text-align:center;padding:32px;color:var(--text-4);font-size:14px; }
+  .tab-empty i { font-size:28px;display:block;margin-bottom:8px; }
 `;
 document.head.appendChild(_s);
+
+
+/* ════════════════════════════════════════════════════════
+   TRANSFERT DE PROPRIÉTÉ
+════════════════════════════════════════════════════════ */
+const URL_TRANSFERT = '{{ url("admin/residents/transferer-propriete") }}';
+const URL_HIST_PROP = '{{ url("admin/appartements") }}';
+
+function openTransfert(residentId, residentNom, apts) {
+  document.getElementById('transfertAncienId').value    = residentId;
+  document.getElementById('transfertAncienLabel').value = residentNom;
+  document.getElementById('transfertSubtitle').textContent = residentNom;
+  document.getElementById('transfertNouveauId').value   = '';
+  document.getElementById('transfertDateVente').value   = '';
+  document.getElementById('transfertAptId').value       = '';
+  document.getElementById('prorataPreview').style.display = 'none';
+
+  // ── Peupler le select d'appartements ──────────────────────────
+  const sel = document.getElementById('transfertAptSelect');
+  sel.innerHTML = '<option value="">— Sélectionner l\'appartement à vendre —</option>';
+
+  apts.forEach(apt => {
+    const opt   = document.createElement('option');
+    opt.value   = apt.id;
+    opt.dataset.label = 'Apt. ' + apt.numero + (apt.res ? ' · ' + apt.res : '');
+    opt.textContent   = opt.dataset.label;
+    sel.appendChild(opt);
+  });
+
+  // Si 1 seul appartement : le sélectionner automatiquement
+  if (apts.length === 1) {
+    sel.value = apts[0].id;
+    document.getElementById('transfertAptId').value = apts[0].id;
+    document.getElementById('transfertSubtitle').textContent =
+      residentNom + ' · Apt. ' + apts[0].numero + (apts[0].res ? ' · ' + apts[0].res : '');
+  }
+
+  clearErrors(['errTransfertNouveau','errTransfertDate','errTransfertApt']);
+  openModal('modalTransfert');
+}
+
+/* Mise à jour de l'hidden transfertAptId quand le select change */
+function onAptSelectChange() {
+  const sel = document.getElementById('transfertAptSelect');
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById('transfertAptId').value = sel.value;
+
+  const ancienNom = document.getElementById('transfertAncienLabel').value;
+  document.getElementById('transfertSubtitle').textContent = sel.value
+    ? ancienNom + ' · ' + (opt.dataset.label ?? opt.textContent)
+    : ancienNom;
+
+  // Reset prorata si on change d'apt
+  document.getElementById('prorataPreview').style.display = 'none';
+}
+
+/* Calcul prorata dynamique à la sélection de la date */
+document.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.getElementById('transfertDateVente');
+  if (dateInput) dateInput.addEventListener('change', calculerProrataPreview);
+});
+
+function calculerProrataPreview() {
+  const dateStr = document.getElementById('transfertDateVente').value;
+  if (!dateStr) { document.getElementById('prorataPreview').style.display = 'none'; return; }
+
+  const date       = new Date(dateStr);
+  const annee      = date.getFullYear();
+  const debutAnnee = new Date(annee, 0, 1);
+  const finAnnee   = new Date(annee, 11, 31);
+  const msJour     = 86400000;
+  const joursAnnee = Math.round((finAnnee - debutAnnee) / msJour) + 1;
+
+  const veille      = new Date(date - msJour);
+  const joursAncien = Math.max(0, Math.round((veille - debutAnnee) / msJour) + 1);
+  const joursNouv   = Math.max(0, Math.round((finAnnee - date) / msJour) + 1);
+
+  const pctA = joursAnnee > 0 ? (joursAncien / joursAnnee * 100).toFixed(1) : 0;
+  const pctN = joursAnnee > 0 ? (joursNouv   / joursAnnee * 100).toFixed(1) : 0;
+
+  const fmt = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  document.getElementById('prorataAncien').textContent        = pctA + '% du montant annuel';
+  document.getElementById('prorataAncienPeriode').textContent = '01/01/' + annee + ' → ' + fmt(veille) + ' (' + joursAncien + 'j)';
+  document.getElementById('prorataNouveau').textContent       = pctN + '% du montant annuel';
+  document.getElementById('prorataNouveauPeriode').textContent= fmt(date) + ' → 31/12/' + annee + ' (' + joursNouv + 'j)';
+
+  document.getElementById('prorataPreview').style.display = 'block';
+}
+
+async function submitTransfert() {
+  clearErrors(['errTransfertNouveau','errTransfertDate']);
+
+  const aptId     = document.getElementById('transfertAptId').value;
+  const nouveauId = document.getElementById('transfertNouveauId').value;
+  const date      = document.getElementById('transfertDateVente').value;
+
+  const aptId2 = document.getElementById('transfertAptId').value;
+
+  let ok = true;
+  if (!aptId2)    { showError('errTransfertApt',     'Sélectionnez l\'appartement à transférer.'); ok = false; }
+  if (!nouveauId) { showError('errTransfertNouveau', 'Sélectionnez le nouveau propriétaire.'); ok = false; }
+  if (!date)      { showError('errTransfertDate',    'La date de vente est obligatoire.');     ok = false; }
+  if (!ok) return;
+
+  setLoading('btnTransfert', true, '<i class="fa-solid fa-right-left"></i> Confirmer le transfert');
+
+  try {
+    const data = await apiFetch(URL_TRANSFERT, 'POST', {
+      appartement_id:          aptId2,
+      nouveau_proprietaire_id: nouveauId,
+      date_vente:              date,
+    });
+    setLoading('btnTransfert', false, '<i class="fa-solid fa-right-left"></i> Confirmer le transfert');
+
+    if (data.success) {
+      closeModal('modalTransfert');
+      showToast(data.message, 'success');
+      setTimeout(() => location.reload(), 950);
+    } else {
+      if (data.errors) {
+        if (data.errors.nouveau_proprietaire_id)
+          showError('errTransfertNouveau', data.errors.nouveau_proprietaire_id[0]);
+        if (data.errors.date_vente)
+          showError('errTransfertDate', data.errors.date_vente[0]);
+      }
+      showToast(data.message || 'Erreur.', 'error');
+    }
+  } catch {
+    setLoading('btnTransfert', false, '<i class="fa-solid fa-right-left"></i> Confirmer le transfert');
+    showToast('Erreur réseau.', 'error');
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   HISTORIQUE PROPRIÉTAIRES (chargé à la demande)
+════════════════════════════════════════════════════════ */
+async function chargerHistoriqueProprietaires(aptId, containerId) {
+  const el = document.getElementById(containerId);
+  if (!aptId) {
+    el.innerHTML = '<div class="tab-empty"><i class="fa-solid fa-building"></i><p>Aucun appartement associé.</p></div>';
+    return;
+  }
+  el.innerHTML = '<div class="tab-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+
+  try {
+    const data = await apiFetch(URL_HIST_PROP + '/' + aptId + '/historique-proprietaires', 'GET');
+    if (!data.success || !data.historique.length) {
+      el.innerHTML = '<div class="tab-empty"><i class="fa-solid fa-clock-rotate-left"></i><p>Aucun historique disponible.</p></div>';
+      return;
+    }
+    const palette = ['#4f46e5','#0891b2','#059669','#d97706','#7c3aed','#db2777'];
+    const fmt = str => str ? new Date(str).toLocaleDateString('fr-FR') : '—';
+    el.innerHTML = `
+      <table class="erp-table">
+        <thead>
+          <tr><th>Propriétaire</th><th>Date début</th><th>Date fin</th><th>Durée</th><th>Statut</th></tr>
+        </thead>
+        <tbody>
+          ${data.historique.map((h, i) => {
+            const col = h.en_cours ? '#059669' : palette[i % palette.length];
+            return `<tr>
+              <td>
+                <div class="tenant-cell">
+                  <div class="t-avatar" style="background:${col};opacity:${h.en_cours ? 1 : 0.7}">${h.initiales}</div>
+                  <div>
+                    <span class="t-name">${h.proprietaire?.prenom ?? ''} ${h.proprietaire?.nom ?? ''}</span>
+                    <span class="t-type">${h.proprietaire?.email ?? '—'}</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="date-text">${fmt(h.date_debut)}</span></td>
+              <td>${h.date_fin
+                ? `<span class="date-text">${fmt(h.date_fin)}</span>`
+                : '<span style="color:var(--green-t);font-weight:600;font-size:12.5px"><i class="fa-solid fa-circle" style="font-size:7px;margin-right:4px"></i>En cours</span>'}</td>
+              <td><span style="font-size:12.5px;color:var(--text-3)">${h.duree_label}</span></td>
+              <td>${h.en_cours
+                ? '<span class="s-badge active">Actuel</span>'
+                : '<span class="s-badge inactive">Ancien</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  } catch {
+    el.innerHTML = '<div class="tab-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Erreur de chargement.</p></div>';
+  }
+}
 
 </script>
 @endpush

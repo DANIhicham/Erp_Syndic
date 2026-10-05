@@ -6,25 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('residences', function (Blueprint $table) {
+        Schema::create('configuration_budgets', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
-            $table->string('adresse');
-            $table->string('code_postal')->nullable();
+            $table->foreignId('residence_id')->constrained('residences')->cascadeOnDelete();
+            $table->integer('annee');
+            $table->decimal('montant_annuel_fixe', 10, 2);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('residences');
+        Schema::dropIfExists('configuration_budgets');
     }
 };

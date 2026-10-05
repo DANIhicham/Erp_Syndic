@@ -180,7 +180,8 @@ Route::middleware(['auth', 'role:admin,syndic'])->group(function () {
 
 
         Route::resource('residents', ResidentController::class)
-            ->only(['index', 'store', 'update']);
+            ->only(['index', 'store', 'update'])
+            ->parameters(['residents' => 'user']);
 
         Route::patch('residents/{user}/toggle-etat',
             [ResidentController::class, 'toggleEtat']);
@@ -190,6 +191,16 @@ Route::middleware(['auth', 'role:admin,syndic'])->group(function () {
 
         Route::delete('residents/{user}',
             [ResidentController::class, 'destroy']);
+        
+        // Transfert de propriété
+        Route::post('/residents/transferer-propriete',
+            [ResidentController::class, 'transfererPropriete'])
+            ->name('residents.transferer-propriete');
+
+        // Historique propriétaires d'un appartement
+        Route::get('/appartements/{appartement}/historique-proprietaires',
+            [ResidentController::class, 'historiqueProprietaires'])
+            ->name('appartements.historique-proprietaires');
 
 
         Route::resource('utilisateurs', UtilisateurController::class)
@@ -199,6 +210,8 @@ Route::middleware(['auth', 'role:admin,syndic'])->group(function () {
             'utilisateurs/{utilisateur}/toggle-etat',
             [UtilisateurController::class, 'toggleEtat']
         )->name('utilisateurs.toggle-etat');
+
+
 
     });
 });

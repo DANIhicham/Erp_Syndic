@@ -227,6 +227,12 @@
                 <div>
                   <span class="t-name">{{ $apt['nom'] }}</span>
                   <span class="t-type">Propriétaire</span>
+                  @if($apt['est_ancien_prop'])
+                    <span class="s-badge" style="background:#eef2ff;color:var(--brand);font-size:11px;margin-left:5px">
+                      <i class="fa-solid fa-right-left" style="margin-right:3px"></i>
+                      {{ $apt['label_transfert'] }}
+                    </span>
+                  @endif
                 </div>
               </div>
             </td>
@@ -280,7 +286,7 @@
                   <button
                     class="ra-btn encaisser"
                     title="Encaisser"
-                    onclick="openEncaisser({{ $apt['id'] }}, '{{ htmlspecialchars($apt['nom']) }}', '{{ $apt['numero'] }}', {{ $apt['montant_annuel'] }}, {{ $apt['montant_paye'] }}, '{{ $apt['statut'] }}')"
+                    onclick="openEncaisser({{ $apt['id'] }}, '{{ htmlspecialchars($apt['nom']) }}', '{{ $apt['numero'] }}', {{ $apt['montant_annuel'] }}, {{ $apt['montant_paye'] }}, '{{ $apt['statut'] }}', {{ $apt['proprietaire_id'] ?? 'null' }})"
                   >
                     <i class="fa-solid fa-cash-register"></i> Encaisser
                   </button>
@@ -393,6 +399,7 @@
         {{-- Champs cachés --}}
         <input type="hidden" name="annee" id="mcAnnee" value="{{ $annee }}">
         <input type="hidden" name="appartement_id" id="mcAppartementId">
+        <input type="hidden" name="user_id" id="mcUserId">
 
         <div class="form-section-label"><i class="fa-solid fa-user"></i> Copropriétaire & Appartement</div>
         <div class="form-grid">
@@ -410,6 +417,7 @@
                   data-annuel="{{ $apt['montant_annuel'] }}"
                   data-paye="{{ $apt['montant_paye'] }}"
                   data-reste="{{ $apt['reste'] }}"
+                  data-proprietaire-id="{{ $apt['proprietaire_id'] ?? '' }}"
                 >
                   {{ $apt['nom'] }} — Apt. {{ $apt['numero'] }}
                 </option>
@@ -594,9 +602,11 @@ function toast(type, title, msg) {
 /* ═══════════════════════════════════════════════════════════════════
    MODAL ENCAISSER — Pré-remplissage dynamique
    ═══════════════════════════════════════════════════════════════════ */
-function openEncaisser(aptId, nom, num, annuel, paye, statut) {
+function openEncaisser(aptId, nom, num, annuel, paye, statut, proprietaireId) {
   document.getElementById('mcAppartementId').value = aptId;
-  document.getElementById('mcSub').textContent     = `Enregistrer un paiement — Apt. ${num} · ${nom}`;
+  // Stocker le user_id du propriétaire de cette cotisation (peut être l'ancien après transfert)
+  document.getElementById('mcUserId').value = proprietaireId ?? '';
+  document.getElementById('mcSub').textContent = `Enregistrer un paiement — Apt. ${num} · ${nom}`;
 
   // Sélectionner le bon appartement dans le select
   const sel = document.getElementById('mcSelectApt');
@@ -615,6 +625,8 @@ function onAptChange(sel) {
   if (!opt.value) return;
 
   document.getElementById('mcAppartementId').value = opt.value;
+  // Mettre à jour user_id selon le propriétaire de cette cotisation
+  document.getElementById('mcUserId').value = opt.dataset.proprietaireId ?? '';
   document.getElementById('mcSub').textContent = `Enregistrer un paiement — Apt. ${opt.dataset.num} · ${opt.dataset.nom}`;
   updateRecap(opt.dataset.annuel, opt.dataset.paye);
 }
@@ -689,8 +701,12 @@ function submitCotisation() {
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
   btn.disabled  = true;
 
+  const userId = document.getElementById('mcUserId').value;
+  if (!userId) { toast('e', 'Propriétaire introuvable', 'Impossible d\'identifier le propriétaire de cette cotisation.'); return; }
+
   const formData = new FormData(document.getElementById('formCotisation'));
   formData.set('appartement_id', aptId);
+  formData.set('user_id', userId); // propriétaire de la cotisation (ancien ou nouveau)
 
   fetch(`${BASE}/payer`, {
     method: 'POST',

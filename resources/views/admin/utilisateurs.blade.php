@@ -187,11 +187,11 @@
             <td>
               @if($user->etat === 'active')
                 <span class="s-badge active">
-                  <i class="fa-solid fa-circle" style="font-size:7px;margin-right:4px"></i>Actif
+                  Actif
                 </span>
               @else
-                <span class="s-badge" style="background:var(--surface-2);color:var(--text-3);border-color:var(--border-2)">
-                  <i class="fa-regular fa-circle" style="font-size:7px;margin-right:4px"></i>Désactivé
+                <span class="s-badge" style="background:var(--orange-bg);color:var(--orange-t);border-color:var(--border-2)">
+                  Désactivé
                 </span>
               @endif
             </td>

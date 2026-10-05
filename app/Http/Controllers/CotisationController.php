@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Appartement;
+use App\Models\User;
 use App\Models\TransactionPaiement;
 use App\Models\PaiementCotisation;
 use App\Models\ConfigurationBudget;
@@ -30,55 +31,98 @@ class CotisationController extends Controller
             return back()->with('error', 'Veuillez sélectionner une résidence.');
         }
 
-        // ── Budget annuel configuré ──────────────────────────────
-        $cotisationExistante = PaiementCotisation::where('appartement_id', $request->appartement_id)
-            ->where('annee_concernee', $request->annee)
-            ->first();
+        // ══════════════════════════════════════════════════════════
+        // NOUVELLE LOGIQUE : on part de paiement_cotisations
+        // pour capturer TOUS les propriétaires d'une année donnée
+        // (y compris les anciens après transfert de propriété)
+        // ══════════════════════════════════════════════════════════
 
-        $montantMax = (float) ($cotisationExistante?->montant_attendu ?? 0);
+        // ── Étape 1 : collecter tous les (appartement_id, user_id)
+        // ayant une cotisation cette année pour cette résidence ────
+        $cotisationsAnnee = PaiementCotisation::with([
+                'appartement',
+                'user',
+            ])
+            ->where('annee_concernee', $annee)
+            ->whereHas('appartement', fn($q) =>
+                $q->where('residence_id', $residenceId)
+            )
+            ->get();
 
-        // ── Appartements avec leurs données ──────────────────────
-        $query = Appartement::with([
-            'proprietaire',
-            'paiementCotisation' => fn($q) => $q->where('annee_concernee', $annee),
-            'transactions'       => fn($q) => $q->where('annee', $annee)->orderBy('date_paiement', 'desc'),
-        ])
-        ->where('residence_id', $residenceId)
-        ->whereNotNull('proprietaire_id');
+        // ── Étape 2 : compléter avec les appartements qui ont un
+        // propriétaire actuel MAIS pas encore de cotisation cette
+        // année (nouveaux propriétaires sans cotisation générée) ──
+        $aptIdsDejaCouverts = $cotisationsAnnee
+            ->pluck('appartement_id')
+            ->unique();
 
-        // Filtre recherche
-        if ($search) {
-            $query->whereHas('proprietaire', fn($q) =>
-                $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('prenom', 'like', "%{$search}%")
-            )->orWhere('numero', 'like', "%{$search}%");
+        $appartementsSansCotisation = Appartement::with(['proprietaire'])
+            ->where('residence_id', $residenceId)
+            ->whereNotNull('proprietaire_id')
+            ->whereNotIn('id', $aptIdsDejaCouverts)
+            ->get();
+
+        // ── Étape 3 : construire les lignes du tableau ─────────
+        $lignesCotisations = collect();
+
+        // 3a. Lignes issues de paiement_cotisations (anciens + actuels)
+        foreach ($cotisationsAnnee as $cot) {
+            $apt = $cot->appartement;
+            if (!$apt) continue;
+
+            // Charger les transactions filtrées par user_id du propriétaire
+            // lié à cette cotisation (évite le mélange avec l'autre propriétaire)
+            $apt->setRelation('transactions',
+                TransactionPaiement::where('appartement_id', $apt->id)
+                    ->where('annee', $annee)
+                    ->where('user_id', $cot->user_id)
+                    ->orderBy('date_paiement', 'desc')
+                    ->get()
+            );
+
+            $lignesCotisations->push(
+                $this->buildApartmentRowFromCotisation($apt, $cot, $annee)
+            );
         }
 
-        $appartements = $query->get()->map(function ($apt) use ($annee) {
-            return $this->buildApartmentRow($apt, $annee);
-        })
-        ->filter(fn($a) => $a['montant_annuel'] > 0)
-        ->values();
-        // Filtre statut (après mapping car calculé)
+        // 3b. Lignes des appartements sans cotisation générée
+        foreach ($appartementsSansCotisation as $apt) {
+            $apt->setRelation('transactions', collect());
+            $lignesCotisations->push(
+                $this->buildApartmentRow($apt, $annee)
+            );
+        }
+
+        // ── Filtre recherche (client-side prioritaire, mais on
+        // garde le filtre serveur pour les gros volumes) ──────────
+        if ($search) {
+            $lignesCotisations = $lignesCotisations->filter(function ($a) use ($search) {
+                $s = mb_strtolower($search);
+                return str_contains(mb_strtolower($a['nom']), $s)
+                    || str_contains(mb_strtolower($a['numero']), $s);
+            });
+        }
+
+        $appartements = $lignesCotisations
+            ->filter(fn($a) => $a['montant_annuel'] > 0)
+            ->values();
+
+        // Filtre statut
         if ($statut) {
             $appartements = $appartements->filter(fn($a) => $a['statut'] === $statut)->values();
         }
 
         $montantAnnuelFixe = ConfigurationBudget::where('residence_id', $residenceId)
-        ->where('annee', $annee)
-        ->value('montant_annuel_fixe') ?? 0;
-
-        // ── KPIs ──────────────────────────────────────────────────
-
+            ->where('annee', $annee)
+            ->value('montant_annuel_fixe') ?? 0;
 
         $stats = $this->computeStats($appartements);
-        // ── Années disponibles pour le filtre ─────────────────────
-        $annees = ConfigurationBudget::where('residence_id', $residenceId)
-        ->orderBy('annee', 'desc')
-        ->pluck('annee')
-        ->toArray();
 
-        // Ajouter l'année courante si absente
+        $annees = ConfigurationBudget::where('residence_id', $residenceId)
+            ->orderBy('annee', 'desc')
+            ->pluck('annee')
+            ->toArray();
+
         if (!in_array(date('Y'), $annees)) array_unshift($annees, (int) date('Y'));
 
         return view('syndic.cotisations', compact(
@@ -100,6 +144,7 @@ class CotisationController extends Controller
     {
         $request->validate([
             'appartement_id' => 'required|exists:appartements,id',
+            'user_id'        => 'required|exists:users,id',  // ← propriétaire de la cotisation cliquée
             'annee'          => 'required|integer|min:2000|max:2100',
             'montant'        => 'required|numeric|min:0.01',
             'date_paiement'  => 'required|date',
@@ -113,28 +158,47 @@ class CotisationController extends Controller
         try {
             $residenceId = session('residence_id');
 
-            // ── Vérifier le montant déjà payé ────────────────────
-            $dejaPayé = TransactionPaiement::where('appartement_id', $request->appartement_id)
-                                           ->where('annee', $request->annee)
-                                           ->sum('montant');
+            $appartement = Appartement::findOrFail($request->appartement_id);
 
+            // ── Utiliser le user_id envoyé par le blade ────────────
+            // C'est le propriétaire de la cotisation cliquée
+            // (peut être l'ancien propriétaire après un transfert)
+            $proprietaireId = (int) $request->user_id;
+
+            // ── Vérifier que ce user a bien une cotisation pour cet apt/année ──
             $cotisationExistante = PaiementCotisation::where('appartement_id', $request->appartement_id)
                 ->where('annee_concernee', $request->annee)
+                ->where('user_id', $proprietaireId)
                 ->first();
 
-            $montantMax = (float) ($cotisationExistante?->montant_attendu ?? 0);
+            if (!$cotisationExistante) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Aucune cotisation trouvée pour ce propriétaire sur cette année.',
+                ], 422);
+            }
+
+            $montantMax = (float) ($cotisationExistante->montant_attendu ?? 0);
+
+            // ── Montant déjà payé par CE propriétaire pour cet apt/année ──
+            $dejaPayé = TransactionPaiement::where('appartement_id', $request->appartement_id)
+                                           ->where('annee', $request->annee)
+                                           ->where('user_id', $proprietaireId)
+                                           ->sum('montant');
 
             if ($montantMax > 0 && ($dejaPayé + $request->montant) > $montantMax) {
+                DB::rollBack();
                 return response()->json([
                     'success' => false,
                     'message' => 'Le montant dépasse le budget annuel (' . number_format($montantMax, 0, ',', ' ') . ' MAD).',
                 ], 422);
             }
 
-            // ── Créer la transaction ──────────────────────────────
+            // ── Créer la transaction liée au bon propriétaire ─────
             $transaction = TransactionPaiement::create([
                 'appartement_id' => $request->appartement_id,
-                'user_id'        => auth()->id(),
+                'user_id'        => $proprietaireId,
                 'annee'          => $request->annee,
                 'montant'        => $request->montant,
                 'date_paiement'  => $request->date_paiement,
@@ -160,20 +224,22 @@ class CotisationController extends Controller
                 ]);
             }
 
-            // ── Mettre à jour paiement_cotisations (résumé) ───────
+            // ── Mettre à jour paiement_cotisations du BON propriétaire ──
             $cotisation = PaiementCotisation::firstOrNew([
                 'appartement_id'  => $request->appartement_id,
                 'annee_concernee' => $request->annee,
+                'user_id'         => $proprietaireId,  // ← scope complet
             ]);
 
+            // totalPaye filtré par CE propriétaire uniquement
             $totalPaye = TransactionPaiement::where('appartement_id', $request->appartement_id)
                                             ->where('annee', $request->annee)
+                                            ->where('user_id', $proprietaireId)
                                             ->sum('montant');
 
-            $cotisation->user_id         = auth()->id();
+            $cotisation->user_id         = $proprietaireId;
             $cotisation->montant_paye    = $totalPaye;
             $cotisation->montant_attendu = $montantMax;
-            $appartement = Appartement::find($request->appartement_id);
 
             $coverage = $this->calculateCoverage(
                 $appartement,
@@ -219,17 +285,31 @@ class CotisationController extends Controller
 
         $appartement = Appartement::with('proprietaire')->findOrFail($appartementId);
 
-        // ── Transactions ───────────────────────────────────────────
+        // ── Récupérer la cotisation du propriétaire concerné ─────
+        // (peut être l'ancien ou le nouveau selon qui on consulte)
+        $cotisation = PaiementCotisation::where('appartement_id', $appartementId)
+            ->where('annee_concernee', $annee)
+            ->where('user_id', $appartement->proprietaire_id)
+            ->first();
+
+        // Fallback : si pas de cotisation pour le propriétaire actuel,
+        // prendre la première disponible (cas historique)
+        if (!$cotisation) {
+            $cotisation = PaiementCotisation::where('appartement_id', $appartementId)
+                ->where('annee_concernee', $annee)
+                ->orderByDesc('created_at')
+                ->first();
+        }
+
+        $proprietaireId = $cotisation?->user_id ?? $appartement->proprietaire_id;
+
+        // ── Transactions filtrées par propriétaire de la cotisation ──
         $transactions = TransactionPaiement::where('appartement_id', $appartementId)
             ->where('annee', $annee)
+            ->where('user_id', $proprietaireId)
             ->with('documents')
             ->orderBy('date_paiement', 'asc')
             ->get();
-
-        // ── Cotisation attendue ────────────────────────────────────
-        $cotisation = PaiementCotisation::where('appartement_id', $appartementId)
-            ->where('annee_concernee', $annee)
-            ->first();
 
         $montantAttendu = (float) ($cotisation?->montant_attendu ?? 0);
 
@@ -303,10 +383,14 @@ class CotisationController extends Controller
             $config      = ConfigurationBudget::where('residence_id', $residenceId)
                                               ->where('annee', $annee)->first();
             $montantMax  = $config ? (float) $config->montant_annuel_fixe : 0;
-            $totalPaye   = TransactionPaiement::where('appartement_id', $aptId)
-                                              ->where('annee', $annee)->sum('montant');
-            
-            $appartement = Appartement::find($aptId);
+            $appartement    = Appartement::findOrFail($aptId);
+            // user_id de la transaction supprimée = propriétaire concerné
+            $proprietaireId = $transaction->user_id;
+
+            $totalPaye = TransactionPaiement::where('appartement_id', $aptId)
+                ->where('annee', $annee)
+                ->where('user_id', $proprietaireId)
+                ->sum('montant');
 
             $coverage = $this->calculateCoverage(
                 $appartement,
@@ -316,7 +400,11 @@ class CotisationController extends Controller
             );
 
             PaiementCotisation::updateOrCreate(
-                ['appartement_id' => $aptId, 'annee_concernee' => $annee],
+                [
+                    'appartement_id'  => $aptId,
+                    'annee_concernee' => $annee,
+                    'user_id'         => $proprietaireId,
+                ],
                 [
                     'montant_paye'    => $totalPaye,
                     'montant_attendu' => $montantMax,
@@ -398,6 +486,75 @@ class CotisationController extends Controller
     // ═══════════════════════════════════════════════════════════════
     // HELPERS PRIVÉS
     // ═══════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
+    // HELPER — Construire une ligne depuis une cotisation existante
+    // Utilisé pour afficher les anciens propriétaires après transfert
+    // ═══════════════════════════════════════════════════════════════
+    private function buildApartmentRowFromCotisation(
+        Appartement $apt,
+        PaiementCotisation $cot,
+        int $annee
+    ): array {
+        $montantAttendu = (float) ($cot->montant_attendu ?? 0);
+
+        // Transactions de l'appartement pour cette année
+        $montantPaye = (float) $apt->transactions->sum('montant');
+        $reste       = max(0, $montantAttendu - $montantPaye);
+
+        $coverage = $this->calculateCoverage($apt, $annee, $montantAttendu, $montantPaye);
+
+        $statut = $this->computeStatut(
+            $montantPaye,
+            $montantAttendu,
+            $coverage['date_echeance'],
+            $annee
+        );
+
+        // Synchronisation DB si statut changé
+        if ($cot->statut !== $statut) {
+            $cot->update(['statut' => $statut, 'montant_paye' => $montantPaye]);
+        }
+
+        // Le "propriétaire" affiché est celui lié à la cotisation (user_id)
+        // et non forcément le proprietaire_id actuel de l'appartement
+        $proprietaire = $cot->user;
+        $initiales    = $proprietaire
+            ? mb_strtoupper(mb_substr($proprietaire->prenom, 0, 1) . mb_substr($proprietaire->nom, 0, 1))
+            : '??';
+
+        // Détecter si c'est un ancien propriétaire (après transfert)
+        $estAncienProp = $proprietaire && $apt->proprietaire_id !== $proprietaire->id;
+
+        $lastTransaction = $apt->transactions->sortByDesc('date_paiement')->first();
+
+        return [
+            'id'               => $apt->id,
+            'numero'           => $apt->numero,
+            'nom'              => $proprietaire
+                ? $proprietaire->prenom . ' ' . $proprietaire->nom
+                : '—',
+            'email'            => $proprietaire?->email,
+            'telephone'        => $proprietaire?->telephone,
+            'initiales'        => $initiales,
+            'montant_annuel'   => $montantAttendu,
+            'montant_paye'     => $montantPaye,
+            'reste'            => $reste,
+            'statut'           => $statut,
+            'date_echeance'    => $statut === 'payé'
+                ? null
+                : ($coverage['date_echeance'] ? $coverage['date_echeance']->format('d/m/Y') : null),
+            'jours_couverts'   => $coverage['jours_couverts'],
+            'nb_transactions'  => $apt->transactions->count(),
+            'proprietaire_id'  => $proprietaire?->id,
+            'last_transaction_id' => $lastTransaction?->id,
+            // Label visuel pour distinguer les anciens propriétaires
+            'est_ancien_prop'  => $estAncienProp,
+            'label_transfert'  => $estAncienProp
+                ? 'Ancien prop ' . $annee
+                : null,
+        ];
+    }
+
     private function buildApartmentRow($apt, int $annee): array
     {
         $cotisation = PaiementCotisation::where('appartement_id', $apt->id)
@@ -440,25 +597,27 @@ class CotisationController extends Controller
             ? mb_strtoupper(mb_substr($proprietaire->prenom, 0, 1) . mb_substr($proprietaire->nom, 0, 1))
             : '??';
 
-        $lastTransaction = $apt->transactions->sortByDesc('date_paiement')->first(); 
+        $lastTransaction = $apt->transactions->sortByDesc('date_paiement')->first();
         return [
-            'id'              => $apt->id,
-            'numero'          => $apt->numero,
-            'nom'             => $proprietaire ? $proprietaire->prenom . ' ' . $proprietaire->nom : '—',
-            'email'           => $proprietaire?->email,
-            'telephone'       => $proprietaire?->telephone,
-            'initiales'       => $initiales,
-            'montant_annuel'  => $montantAttendu,
-            'montant_paye'    => $montantPaye,
-            'reste'           => $reste,
-            'statut'          => $statut,
-            'date_echeance' => $statut === 'payé'
-            ? null
-            : ($dateEcheance ? $dateEcheance->format('d/m/Y') : null),
-            'jours_couverts' => $joursCouverts,
-            'nb_transactions' => $apt->transactions->count(),
-            'proprietaire_id' => $apt->proprietaire_id,
-            'last_transaction_id' => $lastTransaction?->id,
+            'id'                   => $apt->id,
+            'numero'               => $apt->numero,
+            'nom'                  => $proprietaire ? $proprietaire->prenom . ' ' . $proprietaire->nom : '—',
+            'email'                => $proprietaire?->email,
+            'telephone'            => $proprietaire?->telephone,
+            'initiales'            => $initiales,
+            'montant_annuel'       => $montantAttendu,
+            'montant_paye'         => $montantPaye,
+            'reste'                => $reste,
+            'statut'               => $statut,
+            'date_echeance'        => $statut === 'payé'
+                ? null
+                : ($dateEcheance ? $dateEcheance->format('d/m/Y') : null),
+            'jours_couverts'       => $joursCouverts,
+            'nb_transactions'      => $apt->transactions->count(),
+            'proprietaire_id'      => $apt->proprietaire_id,
+            'last_transaction_id'  => $lastTransaction?->id,
+            'est_ancien_prop'      => false,
+            'label_transfert'      => null,
         ];
     }
 
@@ -585,16 +744,18 @@ class CotisationController extends Controller
         $residence    = $appartement->residence;
         $annee        = $transaction->annee;
 
-        // ── Cotisation ─────────────────────────────
+        // ── Cotisation du propriétaire concerné ────────────────────
         $cotisation = PaiementCotisation::where('appartement_id', $appartement->id)
             ->where('annee_concernee', $annee)
+            ->where('user_id', $appartement->proprietaire_id)
             ->first();
 
         $montantAttendu = (float) ($cotisation?->montant_attendu ?? 0);
 
-        // ── Total payé ─────────────────────────────
+        // ── Total payé filtré par propriétaire actuel ───────────────
         $totalPaye = TransactionPaiement::where('appartement_id', $appartement->id)
             ->where('annee', $annee)
+            ->where('user_id', $appartement->proprietaire_id)
             ->sum('montant');
 
         $reste = max(0, $montantAttendu - $totalPaye);

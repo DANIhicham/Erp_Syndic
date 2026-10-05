@@ -6,32 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('depenses_residences', function (Blueprint $table) {
-           $table->id();
-            $table->foreignId('residence_id')->constrained('residences')->onDelete('cascade');
-            $table->integer('annee');
+            $table->id();
+            $table->foreignId('residence_id')->constrained('residences')->cascadeOnDelete();
             $table->string('titre');
             $table->string('fournisseur')->nullable();
             $table->string('categorie');
-            $table->decimal('montant_reel', 10, 2);
-            $table->string('frequence'); 
+            $table->enum('type_depense', ['mensuel', 'trimestriel', 'unique', 'variable']);
+            $table->enum('type', ['mensuel', 'trimestriel', 'unique', 'variable']);
             $table->text('description')->nullable();
             $table->date('date_debut');
             $table->date('date_fin')->nullable();
+            $table->decimal('montant', 12, 2)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('depense_residences');
+        Schema::dropIfExists('depenses_residences');
     }
 };

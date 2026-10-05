@@ -329,7 +329,6 @@
         <label class="form-label">Statut d'occupation <span style="color:var(--red-t)">*</span></label>
         <select id="addStatut" class="form-control">
           <option value="libre">Libre</option>
-          <option value="occupe">Occupé</option>
         </select>
       </div>
 

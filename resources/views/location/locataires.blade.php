@@ -375,9 +375,9 @@
       <button class="tab-btn" onclick="switchTab('dTabPaiements')" id="tbDPaiements">
         <i class="fa-solid fa-calendar-check" style="margin-right:5px"></i>Paiements
       </button>
-      <button class="tab-btn" onclick="switchTab('dTabReclamations')" id="tbDReclamations">
+      <!-- <button class="tab-btn" onclick="switchTab('dTabReclamations')" id="tbDReclamations">
         <i class="fa-solid fa-flag" style="margin-right:5px"></i>Réclamations
-      </button>
+      </button> -->
       <button class="tab-btn" onclick="switchTab('dTabDocuments')" id="tbDDocuments">
         <i class="fa-solid fa-folder-open" style="margin-right:5px"></i>Documents
       </button>

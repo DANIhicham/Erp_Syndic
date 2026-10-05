@@ -536,7 +536,20 @@ a{text-decoration:none}
 .toast-close{width:24px;height:24px;border-radius:5px;border:none;background:none;color:#94a3b8;cursor:pointer;transition:var(--tr);display:flex;align-items:center;justify-content:center;font-size:12px}
 .toast-close:hover{background:#f1f5f9}
 .paid{background:var(--green-bg);color:var(--green-t)}
+.toast-icon-wrap.s{
+    background:var(--green-bg);
+    color:var(--green-t);
+}
 
+.toast-icon-wrap.w{
+    background:var(--orange-bg);
+    color:var(--orange-t);
+}
+
+.toast-icon-wrap.e{
+    background:var(--red-bg);
+    color:var(--red-t);
+}
 /* ── ANIMATIONS ────────────────────────────────────────────────── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}

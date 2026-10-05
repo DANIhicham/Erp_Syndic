@@ -6,42 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('transactions_loyer', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('paiement_loyer_id')
-                ->constrained('paiements_loyer')
-                ->cascadeOnDelete();
-
-            $table->foreignId('contrat_id')
-                ->constrained('contrats')
-                ->cascadeOnDelete();
-
+            $table->foreignId('paiement_loyer_id')->constrained('paiements_loyer')->cascadeOnDelete();
+            $table->foreignId('contrat_id')->constrained('contrats')->cascadeOnDelete();
             $table->decimal('montant', 12, 2);
-            $table->date('date_paiement');
-
+            $table->date('date_paiement')->index();
             $table->enum('mode_paiement', ['espece', 'virement', 'cheque']);
-
             $table->string('reference')->nullable();
             $table->text('commentaire')->nullable();
-
             $table->timestamps();
-
-            // Index demandés
-            $table->index('paiement_loyer_id');
-            $table->index('contrat_id');
-            $table->index('date_paiement');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('transactions_loyer');

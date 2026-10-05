@@ -63,7 +63,7 @@
         </div>
 
         <div class="info-row">
-            <span class="label">NOM PROPRIÉTAIRE :</span> {{ $proprietaire->prenom }} {{ $proprietaire->nom }}
+            <span class="label">NOM PROPRIÉTAIRE :</span> {{ $proprietaire->prenom }} {{ $proprietaire->nom }} 
         </div>
         <div class="info-row">
             <span class="label">MONTANT CHARGES ANNUELLES PAR APPARTEMENT :</span> {{ number_format($montantAttendu,0,',',' ') }} MAD
